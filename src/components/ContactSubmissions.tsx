@@ -12,6 +12,7 @@ import {
   updateContactStatus,
   deleteContactSubmission,
 } from "@/lib/contact";
+import { useMockData } from "./MockDataProvider";
 
 const ContactSubmissions = () => {
   const [submissions, setSubmissions] = useState<ContactFormData[]>([]);
@@ -21,16 +22,22 @@ const ContactSubmissions = () => {
   const [selectedSubmission, setSelectedSubmission] =
     useState<ContactFormData | null>(null);
 
-  const fetchSubmissions = async (status?: string) => {
+  // Get the contactSubmissions directly from the context
+  const { contactSubmissions: mockSubmissions } = useMockData();
+
+  const fetchSubmissions = (status?: string) => {
     setLoading(true);
     setError(null);
 
     try {
-      const data = await getContactSubmissions(
-        status !== "all" ? status : undefined,
-      );
-      if (data) {
-        setSubmissions(data);
+      // Filter submissions based on status
+      const filteredSubmissions =
+        status !== "all" && status
+          ? mockSubmissions.filter((sub) => sub.status === status)
+          : mockSubmissions;
+
+      if (filteredSubmissions) {
+        setSubmissions(filteredSubmissions);
       } else {
         throw new Error("Failed to fetch contact submissions");
       }
@@ -44,7 +51,10 @@ const ContactSubmissions = () => {
 
   useEffect(() => {
     fetchSubmissions(activeTab);
-  }, [activeTab]);
+  }, [activeTab, mockSubmissions]);
+
+  // Get the updateContactStatus function directly from the context
+  const { updateContactStatus } = useMockData();
 
   const handleStatusChange = async (id: string, newStatus: string) => {
     try {
@@ -77,6 +87,9 @@ const ContactSubmissions = () => {
       setError("Failed to update status. Please try again.");
     }
   };
+
+  // Get the deleteContactSubmission function directly from the context
+  const { deleteContactSubmission } = useMockData();
 
   const handleDelete = async (id: string) => {
     if (

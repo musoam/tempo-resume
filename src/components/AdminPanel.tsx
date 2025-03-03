@@ -112,9 +112,9 @@ const AdminPanel = () => {
                   }
                   onSubmit={async (values) => {
                     try {
-                      // Import dynamically to avoid loading this on the client unnecessarily
+                      // Import the Supabase project functions
                       const { createProject, updateProject } = await import(
-                        "@/lib/projects"
+                        "@/lib/projects-supabase"
                       );
 
                       if (selectedProject) {

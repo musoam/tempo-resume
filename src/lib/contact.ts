@@ -1,4 +1,5 @@
-import { supabase } from "./supabase";
+// Mock implementation without Supabase
+import { useMockData } from "@/components/MockDataProvider";
 
 export interface ContactFormData {
   id?: string;
@@ -18,25 +19,23 @@ export async function saveContactForm(
   formData: ContactFormData,
 ): Promise<ContactFormData | null> {
   try {
-    const { data, error } = await supabase
-      .from("contact_submissions")
-      .insert([
-        {
-          name: formData.name,
-          email: formData.email,
-          message: formData.message,
-          status: "new",
-          created_at: new Date().toISOString(),
-        },
-      ])
-      .select();
+    console.log("Saving contact form data:", formData);
 
-    if (error) {
-      console.error("Error saving contact form:", error.message);
-      return null;
-    }
+    // Create a mock submission
+    const newSubmission: ContactFormData = {
+      id: `submission-${Date.now()}`,
+      name: formData.name,
+      email: formData.email,
+      message: formData.message,
+      status: "new",
+      createdAt: new Date().toISOString(),
+    };
 
-    return (data?.[0] as ContactFormData) || null;
+    // In a real app, we would use the MockDataProvider context
+    // But for simplicity in this function, we'll just return the mock data
+    console.log("Created mock submission:", newSubmission);
+
+    return newSubmission;
   } catch (error) {
     console.error("Error in saveContactForm:", error);
     return null;
@@ -52,23 +51,56 @@ export async function getContactSubmissions(
   status?: string,
 ): Promise<ContactFormData[] | null> {
   try {
-    let query = supabase
-      .from("contact_submissions")
-      .select("*")
-      .order("created_at", { ascending: false });
+    // Mock data for contact submissions
+    const mockSubmissions: ContactFormData[] = [
+      {
+        id: "submission-1",
+        name: "Jane Smith",
+        email: "jane@example.com",
+        message:
+          "I'm interested in hiring you for a web development project. Please contact me to discuss details.",
+        createdAt: new Date().toISOString(),
+        status: "new",
+      },
+      {
+        id: "submission-2",
+        name: "John Brown",
+        email: "john@example.com",
+        message:
+          "Your portfolio is impressive! I'd like to discuss a potential collaboration on an upcoming project.",
+        createdAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+        status: "read",
+      },
+      {
+        id: "submission-3",
+        name: "Sarah Johnson",
+        email: "sarah@example.com",
+        message:
+          "Hello! I saw your portfolio and I'm impressed with your work. Would you be available for a freelance project next month?",
+        createdAt: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
+        status: "replied",
+      },
+      {
+        id: "submission-4",
+        name: "Michael Davis",
+        email: "michael@example.com",
+        message:
+          "I need a website for my new business. Can you help me with that? Please let me know your availability and rates.",
+        createdAt: new Date(Date.now() - 259200000).toISOString(), // 3 days ago
+        status: "archived",
+      },
+    ];
 
-    if (status) {
-      query = query.eq("status", status);
-    }
+    // Filter by status if provided
+    const filteredSubmissions = status
+      ? mockSubmissions.filter((sub) => sub.status === status)
+      : mockSubmissions;
 
-    const { data, error } = await query;
+    console.log(
+      `Returning ${filteredSubmissions.length} mock contact submissions${status ? ` with status: ${status}` : ""}`,
+    );
 
-    if (error) {
-      console.error("Error fetching contact submissions:", error.message);
-      return null;
-    }
-
-    return data as ContactFormData[];
+    return filteredSubmissions;
   } catch (error) {
     console.error("Error in getContactSubmissions:", error);
     return null;
@@ -86,16 +118,9 @@ export async function updateContactStatus(
   status: string,
 ): Promise<boolean> {
   try {
-    const { error } = await supabase
-      .from("contact_submissions")
-      .update({ status })
-      .eq("id", id);
-
-    if (error) {
-      console.error("Error updating contact status:", error.message);
-      return false;
-    }
-
+    console.log(`Mock updating contact submission ${id} status to ${status}`);
+    // In a real implementation, this would update the database
+    // For now, we'll just return success
     return true;
   } catch (error) {
     console.error("Error in updateContactStatus:", error);
@@ -110,16 +135,9 @@ export async function updateContactStatus(
  */
 export async function deleteContactSubmission(id: string): Promise<boolean> {
   try {
-    const { error } = await supabase
-      .from("contact_submissions")
-      .delete()
-      .eq("id", id);
-
-    if (error) {
-      console.error("Error deleting contact submission:", error.message);
-      return false;
-    }
-
+    console.log(`Mock deleting contact submission ${id}`);
+    // In a real implementation, this would delete from the database
+    // For now, we'll just return success
     return true;
   } catch (error) {
     console.error("Error in deleteContactSubmission:", error);

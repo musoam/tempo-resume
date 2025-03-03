@@ -1,7 +1,6 @@
 import React, { useState, useRef } from "react";
 import { Upload, X, Check, Loader2 } from "lucide-react";
 import { Button } from "./ui/button";
-import { uploadFile } from "@/lib/storage";
 
 interface FileUploaderProps {
   onUploadComplete?: (url: string) => void;
@@ -83,10 +82,11 @@ const FileUploader = ({
     setIsUploading(true);
 
     try {
-      // Import dynamically to avoid loading this on the client unnecessarily
-      const { uploadFile } = await import("@/lib/storage");
+      // Upload file to Supabase
+      console.log("Uploading file to Supabase bucket:", bucket, "path:", path);
 
-      console.log("Uploading file to bucket:", bucket, "path:", path);
+      // Import the uploadFile function
+      const { uploadFile } = await import("@/lib/supabase-storage");
       const fileUrl = await uploadFile(file, bucket, path);
 
       if (fileUrl) {

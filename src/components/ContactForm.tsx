@@ -1,4 +1,5 @@
 import React from "react";
+import { useMockData } from "./MockDataProvider";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -45,15 +46,17 @@ const ContactForm = ({ onSubmit, className = "" }: ContactFormProps = {}) => {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [isSubmitted, setIsSubmitted] = React.useState(false);
 
+  // Get the useMockData hook
+
+  // Get the addContactSubmission function directly from the context
+  const { addContactSubmission } = useMockData();
+
   const handleSubmit = async (values: FormValues) => {
     setIsSubmitting(true);
 
     try {
-      // Import dynamically to avoid loading this on the client unnecessarily
-      const { saveContactForm } = await import("@/lib/contact");
-
-      // Save to Supabase
-      const result = await saveContactForm({
+      // Save to mock data provider
+      const result = await addContactSubmission({
         name: values.name,
         email: values.email,
         message: values.message,

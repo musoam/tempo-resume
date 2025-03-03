@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useMockData } from "./MockDataProvider";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -90,27 +91,28 @@ const SettingsForm = () => {
     },
   });
 
+  // Use the MockDataProvider directly
+  const { siteSettings } = useMockData();
+
   useEffect(() => {
-    const loadSettings = async () => {
+    const loadSettings = () => {
       setLoading(true);
       try {
-        const settings = await getSiteSettings();
-
-        // Set form values
+        // Set form values from the context
         form.reset({
-          title: settings.title,
-          ownerName: settings.ownerName,
-          email: settings.email,
-          phone: settings.phone || "",
-          location: settings.location || "",
-          about: settings.about,
-          heroTitle: settings.heroTitle,
-          heroDescription: settings.heroDescription,
+          title: siteSettings.title,
+          ownerName: siteSettings.ownerName,
+          email: siteSettings.email,
+          phone: siteSettings.phone || "",
+          location: siteSettings.location || "",
+          about: siteSettings.about,
+          heroTitle: siteSettings.heroTitle,
+          heroDescription: siteSettings.heroDescription,
         });
 
         // Set other state
-        setHeroImage(settings.heroImageUrl);
-        setSocialLinks(settings.socialLinks);
+        setHeroImage(siteSettings.heroImageUrl);
+        setSocialLinks(siteSettings.socialLinks);
       } catch (err) {
         console.error("Error loading settings:", err);
         setError("Failed to load settings. Using default values.");
@@ -120,7 +122,7 @@ const SettingsForm = () => {
     };
 
     loadSettings();
-  }, [form]);
+  }, [form, siteSettings]);
 
   const handleHeroImageSelect = (url: string) => {
     setHeroImage(url);
@@ -151,6 +153,9 @@ const SettingsForm = () => {
     newLinks.splice(index, 1);
     setSocialLinks(newLinks);
   };
+
+  // Get the updateSiteSettings function directly from the context
+  const { updateSiteSettings } = useMockData();
 
   const onSubmit = async (values: SettingsFormValues) => {
     if (!heroImage) {
@@ -273,15 +278,17 @@ const SettingsForm = () => {
                       >
                         Remove
                       </Button>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => setShowImageGallery(true)}
+                      >
+                        Change
+                      </Button>
                       <Dialog
                         open={showImageGallery}
                         onOpenChange={setShowImageGallery}
                       >
-                        <DialogTrigger asChild>
-                          <Button variant="secondary" size="sm">
-                            Change
-                          </Button>
-                        </DialogTrigger>
                         <DialogContent className="max-w-3xl">
                           <DialogHeader>
                             <DialogTitle>Select Hero Image</DialogTitle>
@@ -297,20 +304,19 @@ const SettingsForm = () => {
                   </div>
                 ) : (
                   <div className="mb-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full h-32 flex flex-col items-center justify-center border-dashed"
+                      onClick={() => setShowImageGallery(true)}
+                    >
+                      <Image className="h-8 w-8 mb-2 text-gray-400" />
+                      <span>Select Hero Image</span>
+                    </Button>
                     <Dialog
                       open={showImageGallery}
                       onOpenChange={setShowImageGallery}
                     >
-                      <DialogTrigger asChild>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          className="w-full h-32 flex flex-col items-center justify-center border-dashed"
-                        >
-                          <Image className="h-8 w-8 mb-2 text-gray-400" />
-                          <span>Select Hero Image</span>
-                        </Button>
-                      </DialogTrigger>
                       <DialogContent className="max-w-3xl">
                         <DialogHeader>
                           <DialogTitle>Select Hero Image</DialogTitle>

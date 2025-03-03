@@ -3,19 +3,25 @@ import { useRoutes, Routes, Route } from "react-router-dom";
 import Home from "./components/home";
 import routes from "tempo-routes";
 import AnimationProvider from "./components/AnimationProvider";
+import { MockDataProvider } from "./components/MockDataProvider";
 
 const AdminPanel = lazy(() => import("./components/AdminPanel"));
 
 function App() {
   return (
     <Suspense fallback={<p>Loading...</p>}>
-      <AnimationProvider>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/admin/*" element={<AdminPanel />} />
-        </Routes>
-        {import.meta.env.VITE_TEMPO === "true" && useRoutes(routes)}
-      </AnimationProvider>
+      <MockDataProvider>
+        <AnimationProvider>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/admin/*" element={<AdminPanel />} />
+            {import.meta.env.VITE_TEMPO === "true" && (
+              <Route path="/tempobook/*" />
+            )}
+          </Routes>
+          {import.meta.env.VITE_TEMPO === "true" && useRoutes(routes)}
+        </AnimationProvider>
+      </MockDataProvider>
     </Suspense>
   );
 }

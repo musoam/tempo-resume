@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Trash2, Plus, Loader2 } from "lucide-react";
 import { Button } from "./ui/button";
 import FileUploader from "./FileUploader";
-import { listFiles, deleteFile } from "@/lib/storage";
+import { listFiles, deleteFile } from "@/lib/supabase-storage";
 
 interface ImageGalleryProps {
   bucket?: string;
@@ -41,41 +41,19 @@ const ImageGallery = ({
         `Fetching images from bucket: ${bucket}, path: ${path || "root"}`,
       );
 
-      // First, ensure the bucket exists
-      const { createBucketIfNotExists } = await import("@/lib/supabase-admin");
-      const bucketCreated = await createBucketIfNotExists(bucket, true);
-      console.log(`Bucket ${bucket} creation status:`, bucketCreated);
-
-      // Then list files
-      const { listFiles } = await import("@/lib/storage");
+      // Fetch images from Supabase
       const files = await listFiles(bucket, path);
-      console.log("Files from storage:", files);
 
       if (!files) {
         throw new Error("Failed to fetch images");
       }
 
-      // Filter for image files only
-      const imageFiles = files.filter(
-        (file) =>
-          !file.id.includes("/") &&
-          (!file.metadata ||
-            !file.metadata.mimetype ||
-            file.metadata.mimetype.startsWith("image/")),
-      );
-      console.log("Filtered image files:", imageFiles);
+      const imageItems = files.map((file) => ({
+        name: file.name,
+        url: file.url,
+      }));
 
-      // Create image items with URLs
-      const imageItems = imageFiles.map((file) => {
-        const url = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/${bucket}/${path ? `${path}/` : ""}${file.name}`;
-        console.log(`Generated URL for ${file.name}:`, url);
-        return {
-          name: file.name,
-          url: url,
-        };
-      });
-
-      console.log("Setting images:", imageItems);
+      console.log("Fetched images from Supabase:", imageItems);
       setImages(imageItems);
     } catch (err) {
       console.error("Error fetching images:", err);
@@ -196,12 +174,21 @@ const ImageGallery = ({
                   transition={{ duration: 0.3, delay: index * 0.05 }}
                   className={`relative group aspect-square rounded-md overflow-hidden border ${selectedImage === image.url ? "ring-2 ring-primary" : ""}`}
                 >
-                  <img
-                    src={image.url}
-                    alt={image.name}
-                    className="w-full h-full object-cover cursor-pointer"
-                    onClick={() => handleImageSelect(image.url)}
-                  />
+                  <div
+                    className="w-full h-full cursor-pointer"
+                    onClick={() => {
+                      console.log("Image clicked:", image.url);
+                      onSelect(image.url);
+                      setSelectedImage(image.url);
+                      setShowUploader(false);
+                    }}
+                  >
+                    <img
+                      src={image.url}
+                      alt={image.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
 
                   {editable && (
                     <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">

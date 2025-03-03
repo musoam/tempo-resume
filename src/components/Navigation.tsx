@@ -111,15 +111,7 @@ const Navigation = ({
                 </a>
               ),
             )}
-            {showAdmin && (
-              <Link
-                to="/admin"
-                className="text-gray-700 dark:text-gray-200 hover:text-primary transition-colors duration-300 font-medium flex items-center gap-1"
-              >
-                <Settings className="h-4 w-4" />
-                Admin
-              </Link>
-            )}
+            {showAdmin && <></>}
             <ThemeToggle />
           </nav>
 
@@ -194,7 +186,6 @@ const Navigation = ({
           </nav>
         </motion.div>
       </motion.header>
-
       {/* Scroll to Top Button */}
       <TooltipProvider>
         <Tooltip>

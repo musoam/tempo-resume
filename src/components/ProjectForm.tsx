@@ -135,7 +135,7 @@ const ProjectForm = ({
     setAdditionalImages(additionalImages.filter((img) => img !== url));
   };
 
-  const handleSubmit = (values: ProjectFormValues) => {
+  const handleSubmit = async (values: ProjectFormValues) => {
     if (!mainImage) {
       form.setError("root", {
         type: "manual",
@@ -144,11 +144,17 @@ const ProjectForm = ({
       return;
     }
 
-    onSubmit({
-      ...values,
-      imageUrl: mainImage,
-      images: [mainImage, ...additionalImages],
-    });
+    try {
+      const projectData = {
+        ...values,
+        imageUrl: mainImage,
+        images: [mainImage, ...additionalImages],
+      };
+
+      onSubmit(projectData);
+    } catch (error) {
+      console.error("Error in handleSubmit:", error);
+    }
   };
 
   return (

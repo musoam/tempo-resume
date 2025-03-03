@@ -1,5 +1,5 @@
-import { Project, ProjectFormData } from "@/types/project";
 import { supabase } from "./supabase";
+import { Project, ProjectFormData } from "@/types/project";
 
 /**
  * Fetches all projects from Supabase
@@ -7,37 +7,13 @@ import { supabase } from "./supabase";
  */
 export async function getProjects(): Promise<Project[] | null> {
   try {
-    console.log("Fetching projects from Supabase");
     const { data, error } = await supabase
       .from("projects")
       .select("*")
       .order("createdAt", { ascending: false });
 
-    if (error) {
-      throw error;
-    }
-
-    // Transform the data to match our Project type
-    const projects: Project[] = data.map((item) => ({
-      id: item.id,
-      title: item.title,
-      description: item.description,
-      imageUrl: item.imageUrl,
-      tags: item.tags || [],
-      demoUrl: item.demoUrl,
-      githubUrl: item.githubUrl,
-      year: item.year,
-      category: item.category,
-      images: item.images || [],
-      technologies: item.technologies || [],
-      displayType: item.displayType || "popup",
-      slug: item.slug,
-      createdAt: item.createdAt,
-      updatedAt: item.updatedAt,
-    }));
-
-    console.log(`Fetched ${projects.length} projects from Supabase`);
-    return projects;
+    if (error) throw error;
+    return data as Project[];
   } catch (error) {
     console.error("Error in getProjects:", error);
     return null;
@@ -51,41 +27,14 @@ export async function getProjects(): Promise<Project[] | null> {
  */
 export async function getProjectById(id: string): Promise<Project | null> {
   try {
-    console.log(`Getting project by ID: ${id}`);
     const { data, error } = await supabase
       .from("projects")
       .select("*")
       .eq("id", id)
       .single();
 
-    if (error) {
-      throw error;
-    }
-
-    if (!data) {
-      return null;
-    }
-
-    // Transform to match our Project type
-    const project: Project = {
-      id: data.id,
-      title: data.title,
-      description: data.description,
-      imageUrl: data.imageUrl,
-      tags: data.tags || [],
-      demoUrl: data.demoUrl,
-      githubUrl: data.githubUrl,
-      year: data.year,
-      category: data.category,
-      images: data.images || [],
-      technologies: data.technologies || [],
-      displayType: data.displayType || "popup",
-      slug: data.slug,
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
-    };
-
-    return project;
+    if (error) throw error;
+    return data as Project;
   } catch (error) {
     console.error("Error in getProjectById:", error);
     return null;
@@ -99,41 +48,14 @@ export async function getProjectById(id: string): Promise<Project | null> {
  */
 export async function getProjectBySlug(slug: string): Promise<Project | null> {
   try {
-    console.log(`Getting project by slug: ${slug}`);
     const { data, error } = await supabase
       .from("projects")
       .select("*")
       .eq("slug", slug)
       .single();
 
-    if (error) {
-      throw error;
-    }
-
-    if (!data) {
-      return null;
-    }
-
-    // Transform to match our Project type
-    const project: Project = {
-      id: data.id,
-      title: data.title,
-      description: data.description,
-      imageUrl: data.imageUrl,
-      tags: data.tags || [],
-      demoUrl: data.demoUrl,
-      githubUrl: data.githubUrl,
-      year: data.year,
-      category: data.category,
-      images: data.images || [],
-      technologies: data.technologies || [],
-      displayType: data.displayType || "popup",
-      slug: data.slug,
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
-    };
-
-    return project;
+    if (error) throw error;
+    return data as Project;
   } catch (error) {
     console.error("Error in getProjectBySlug:", error);
     return null;
@@ -149,8 +71,6 @@ export async function createProject(
   projectData: ProjectFormData,
 ): Promise<Project | null> {
   try {
-    console.log("Creating project in Supabase:", projectData);
-
     // Generate a slug from the title if not provided
     const slug =
       projectData.slug || projectData.title.toLowerCase().replace(/\s+/g, "-");
@@ -170,38 +90,31 @@ export async function createProject(
       color: getColorForTag(tag),
     }));
 
-    const now = new Date().toISOString();
-
-    // Prepare the project data for Supabase
+    // Create a new project
     const newProject = {
       title: projectData.title,
       description: projectData.description,
       imageUrl: projectData.imageUrl,
       tags,
-      demoUrl: projectData.demoUrl || null,
-      githubUrl: projectData.githubUrl || null,
+      demoUrl: projectData.demoUrl || undefined,
+      githubUrl: projectData.githubUrl || undefined,
       year: projectData.year,
       category: projectData.category,
       images,
       technologies,
       displayType: projectData.displayType || "popup",
       slug,
-      createdAt: now,
-      updatedAt: now,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
 
-    // Insert into Supabase
     const { data, error } = await supabase
       .from("projects")
       .insert([newProject])
       .select()
       .single();
 
-    if (error) {
-      throw error;
-    }
-
-    console.log("Created project in Supabase:", data);
+    if (error) throw error;
     return data as Project;
   } catch (error) {
     console.error("Error in createProject:", error);
@@ -220,8 +133,6 @@ export async function updateProject(
   projectData: ProjectFormData,
 ): Promise<Project | null> {
   try {
-    console.log(`Updating project ${id} in Supabase:`, projectData);
-
     // Generate a slug from the title if not provided
     const slug =
       projectData.slug || projectData.title.toLowerCase().replace(/\s+/g, "-");
@@ -241,14 +152,14 @@ export async function updateProject(
       color: getColorForTag(tag),
     }));
 
-    // Prepare the project data for Supabase
+    // Create updated project
     const updatedProject = {
       title: projectData.title,
       description: projectData.description,
       imageUrl: projectData.imageUrl,
       tags,
-      demoUrl: projectData.demoUrl || null,
-      githubUrl: projectData.githubUrl || null,
+      demoUrl: projectData.demoUrl || undefined,
+      githubUrl: projectData.githubUrl || undefined,
       year: projectData.year,
       category: projectData.category,
       images,
@@ -258,7 +169,6 @@ export async function updateProject(
       updatedAt: new Date().toISOString(),
     };
 
-    // Update in Supabase
     const { data, error } = await supabase
       .from("projects")
       .update(updatedProject)
@@ -266,11 +176,7 @@ export async function updateProject(
       .select()
       .single();
 
-    if (error) {
-      throw error;
-    }
-
-    console.log("Updated project in Supabase:", data);
+    if (error) throw error;
     return data as Project;
   } catch (error) {
     console.error("Error in updateProject:", error);
@@ -285,13 +191,9 @@ export async function updateProject(
  */
 export async function deleteProject(id: string): Promise<boolean> {
   try {
-    console.log(`Deleting project ${id} from Supabase`);
     const { error } = await supabase.from("projects").delete().eq("id", id);
 
-    if (error) {
-      throw error;
-    }
-
+    if (error) throw error;
     return true;
   } catch (error) {
     console.error("Error in deleteProject:", error);

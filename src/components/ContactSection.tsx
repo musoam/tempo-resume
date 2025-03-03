@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useMockData } from "./MockDataProvider";
 import { motion } from "framer-motion";
 import { Mail, MapPin, Phone } from "lucide-react";
 import ContactForm from "./ContactForm";
@@ -52,46 +53,41 @@ const ContactSection = ({
 }: ContactSectionProps) => {
   const [contactInfo, setContactInfo] = useState(initialContactInfo);
 
+  // Get the useMockData hook
+
+  // Get the siteSettings directly from the context
+  const { siteSettings } = useMockData();
+
   useEffect(() => {
-    const loadSettings = async () => {
-      try {
-        const settings = await getSiteSettings();
+    // Update contact info with settings data
+    const updatedContactInfo = [
+      {
+        icon: <Mail className="h-6 w-6" />,
+        title: "Email",
+        details: siteSettings.email,
+        link: `mailto:${siteSettings.email}`,
+      },
+    ];
 
-        // Update contact info with settings data
-        const updatedContactInfo = [
-          {
-            icon: <Mail className="h-6 w-6" />,
-            title: "Email",
-            details: settings.email,
-            link: `mailto:${settings.email}`,
-          },
-        ];
+    if (siteSettings.phone) {
+      updatedContactInfo.push({
+        icon: <Phone className="h-6 w-6" />,
+        title: "Phone",
+        details: siteSettings.phone,
+        link: `tel:${siteSettings.phone.replace(/[^0-9+]/g, "")}`,
+      });
+    }
 
-        if (settings.phone) {
-          updatedContactInfo.push({
-            icon: <Phone className="h-6 w-6" />,
-            title: "Phone",
-            details: settings.phone,
-            link: `tel:${settings.phone.replace(/[^0-9+]/g, "")}`,
-          });
-        }
+    if (siteSettings.location) {
+      updatedContactInfo.push({
+        icon: <MapPin className="h-6 w-6" />,
+        title: "Location",
+        details: siteSettings.location,
+      });
+    }
 
-        if (settings.location) {
-          updatedContactInfo.push({
-            icon: <MapPin className="h-6 w-6" />,
-            title: "Location",
-            details: settings.location,
-          });
-        }
-
-        setContactInfo(updatedContactInfo);
-      } catch (error) {
-        console.error("Error loading contact settings:", error);
-      }
-    };
-
-    loadSettings();
-  }, []);
+    setContactInfo(updatedContactInfo);
+  }, [siteSettings]);
   return (
     <section className={`py-20 px-4 bg-gray-50 dark:bg-gray-900 ${className}`}>
       <div className="container mx-auto max-w-6xl">
@@ -157,7 +153,7 @@ const ContactSection = ({
             <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md">
               <div className="aspect-video w-full rounded-lg overflow-hidden">
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d100939.98555098464!2d-122.50764017948551!3d37.75781499657613!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80859a6d00690021%3A0x4a501367f076adff!2sSan%20Francisco%2C%20CA!5e0!3m2!1sen!2sus!4v1656543745952!5m2!1sen!2sus"
+                  src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyBgEMcP8mSrlPeI8jMLVh9PU7RBrQZVJ6I&q=${encodeURIComponent(siteSettings.location || "San Francisco, CA")}`}
                   className="w-full h-full border-0"
                   allowFullScreen
                   loading="lazy"

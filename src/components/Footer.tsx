@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useMockData } from "./MockDataProvider";
 import { motion } from "framer-motion";
 import { ArrowUp, Github, Twitter, Linkedin } from "lucide-react";
 import { Button } from "./ui/button";
@@ -55,34 +56,29 @@ const Footer = ({
   const [copyrightText, setCopyrightText] = useState(initialCopyrightText);
   const [socialLinksState, setSocialLinksState] = useState(initialSocialLinks);
 
+  // Get the useMockData hook
+
+  // Get the siteSettings directly from the context
+  const { siteSettings } = useMockData();
+
   useEffect(() => {
-    const loadSettings = async () => {
-      try {
-        const settings = await getSiteSettings();
+    // Update copyright text
+    const currentYear = new Date().getFullYear();
+    setCopyrightText(
+      `© ${currentYear} ${siteSettings.title}. All rights reserved.`,
+    );
 
-        // Update copyright text
-        const currentYear = new Date().getFullYear();
-        setCopyrightText(
-          `© ${currentYear} ${settings.title}. All rights reserved.`,
-        );
+    // Update social links
+    if (siteSettings.socialLinks && siteSettings.socialLinks.length > 0) {
+      const formattedLinks = siteSettings.socialLinks.map((link) => ({
+        icon: getIconByName(link.icon),
+        url: link.url,
+        label: link.name,
+      }));
 
-        // Update social links
-        if (settings.socialLinks && settings.socialLinks.length > 0) {
-          const formattedLinks = settings.socialLinks.map((link) => ({
-            icon: getIconByName(link.icon),
-            url: link.url,
-            label: link.name,
-          }));
-
-          setSocialLinksState(formattedLinks);
-        }
-      } catch (error) {
-        console.error("Error loading footer settings:", error);
-      }
-    };
-
-    loadSettings();
-  }, []);
+      setSocialLinksState(formattedLinks);
+    }
+  }, [siteSettings]);
   return (
     <motion.footer
       initial={{ opacity: 0 }}

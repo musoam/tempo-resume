@@ -8,6 +8,7 @@ import { Separator } from "./ui/separator";
 import { getProjects, deleteProject } from "@/lib/projects";
 import { Project } from "@/types/project";
 import { useNavigate } from "react-router-dom";
+import { useMockData } from "./MockDataProvider";
 
 interface ProjectListProps {
   onEditProject: (project: Project) => void;
@@ -24,9 +25,12 @@ const ProjectList = ({ onEditProject }: ProjectListProps) => {
     setError(null);
 
     try {
-      const data = await getProjects();
-      if (data) {
-        setProjects(data);
+      // Import the getProjects function from Supabase
+      const { getProjects } = await import("@/lib/projects-supabase");
+      const projectsData = await getProjects();
+
+      if (projectsData) {
+        setProjects(projectsData);
       } else {
         throw new Error("Failed to fetch projects");
       }
@@ -52,6 +56,8 @@ const ProjectList = ({ onEditProject }: ProjectListProps) => {
     }
 
     try {
+      // Import the deleteProject function from Supabase
+      const { deleteProject } = await import("@/lib/projects-supabase");
       const success = await deleteProject(id);
       if (success) {
         setProjects(projects.filter((project) => project.id !== id));

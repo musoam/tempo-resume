@@ -1,8 +1,54 @@
 import { supabase } from "./supabase";
 
 /**
- * Creates a new storage bucket if it doesn't exist
- * @param bucketName Name of the bucket to create
+ * Initializes storage buckets and tables
+ */
+export async function initializeStorage(): Promise<boolean> {
+  try {
+    console.log("Initializing storage...");
+
+    // Create buckets
+    await createBucketIfNotExists("portfolio-projects", true);
+    await createBucketIfNotExists("portfolio-profile", true);
+
+    // Create site_settings table
+    try {
+      const { data: settingsCheck, error: settingsError } = await supabase
+        .from("site_settings")
+        .select("count")
+        .limit(1);
+
+      if (settingsError) {
+        console.log("Site settings table will be created on first insert");
+
+        // Try to create a default settings entry
+        const { getSiteSettings, updateSiteSettings } = await import(
+          "./settings"
+        );
+        const defaultSettings = await getSiteSettings();
+        const result = await updateSiteSettings(defaultSettings);
+        console.log(
+          "Created default site settings:",
+          result ? "success" : "failed",
+        );
+      } else {
+        console.log("Site settings check result:", settingsCheck);
+      }
+    } catch (err) {
+      console.log("Error checking site_settings table:", err);
+    }
+
+    console.log("Storage initialization complete");
+    return true;
+  } catch (error) {
+    console.error("Error in initializeStorage:", error);
+    return false;
+  }
+}
+
+/**
+ * Creates a storage bucket if it doesn't exist
+ * @param bucketName The name of the bucket to create
  * @param isPublic Whether the bucket should be public
  * @returns Success status
  */
@@ -79,103 +125,5 @@ export async function createBucketIfNotExists(
   } catch (error) {
     console.error("Error in createBucketIfNotExists:", error);
     return false;
-  }
-}
-
-/**
- * Updates bucket settings
- * @param bucketName Name of the bucket to update
- * @param isPublic Whether the bucket should be public
- * @returns Success status
- */
-export async function updateBucketSettings(
-  bucketName: string,
-  isPublic: boolean,
-): Promise<boolean> {
-  try {
-    const { error } = await supabase.storage.updateBucket(bucketName, {
-      public: isPublic,
-    });
-
-    if (error) {
-      console.error("Error updating bucket settings:", error.message);
-      return false;
-    }
-
-    return true;
-  } catch (error) {
-    console.error("Error in updateBucketSettings:", error);
-    return false;
-  }
-}
-
-/**
- * Initializes the required storage buckets for the portfolio application
- */
-export async function initializeStorage(): Promise<void> {
-  try {
-    // Create the main portfolio bucket for general uploads
-    await createBucketIfNotExists("portfolio", true);
-
-    // Create specific buckets for different types of content
-    await createBucketIfNotExists("portfolio-projects", true);
-    await createBucketIfNotExists("portfolio-profile", true);
-
-    // Create database tables if they don't exist
-    await createTablesIfNotExist();
-
-    // Create site_settings table
-    try {
-      const { data: settingsCheck } = await supabase
-        .from("site_settings")
-        .select("count")
-        .limit(1);
-
-      console.log("Site settings check result:", settingsCheck);
-    } catch (err) {
-      console.log("Site settings table will be created on first insert");
-    }
-
-    console.log("Storage initialization completed");
-  } catch (error) {
-    console.error("Error initializing storage:", error);
-  }
-}
-
-/**
- * Creates necessary database tables if they don't exist
- */
-async function createTablesIfNotExist(): Promise<void> {
-  try {
-    // Check if projects table exists by attempting a query
-    const projectsCheck = await supabase
-      .from("projects")
-      .select("count")
-      .limit(1);
-    if (projectsCheck.error) {
-      console.log(
-        "Projects table does not exist, will be created on first insert",
-      );
-    } else {
-      console.log("Projects table exists");
-    }
-
-    // Check if contact_submissions table exists
-    const contactCheck = await supabase
-      .from("contact_submissions")
-      .select("count")
-      .limit(1);
-    if (contactCheck.error) {
-      console.log(
-        "Contact submissions table does not exist, will be created on first insert",
-      );
-    } else {
-      console.log("Contact submissions table exists");
-    }
-
-    // Note: Supabase will auto-create tables on first insert with the correct schema
-    // We don't need to manually create them with SQL commands
-  } catch (error) {
-    console.error("Error in createTablesIfNotExist:", error);
   }
 }

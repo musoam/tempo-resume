@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+// Mock implementation without Supabase
 
 export interface SiteSettings {
   id?: string;
@@ -27,32 +27,9 @@ export interface SocialLink {
  */
 export async function getSiteSettings(): Promise<SiteSettings> {
   try {
-    const { data, error } = await supabase
-      .from("site_settings")
-      .select("*")
-      .limit(1)
-      .single();
-
-    if (error) {
-      console.error("Error fetching site settings:", error.message);
-      return getDefaultSettings();
-    }
-
-    // Convert from database format to SiteSettings format
-    return {
-      id: data.id,
-      title: data.title,
-      ownerName: data.owner_name,
-      email: data.email,
-      phone: data.phone,
-      location: data.location,
-      about: data.about,
-      heroTitle: data.hero_title,
-      heroDescription: data.hero_description,
-      heroImageUrl: data.hero_image_url,
-      socialLinks: data.social_links,
-      updatedAt: data.updated_at,
-    };
+    console.log("Getting mock site settings");
+    // Just return default settings for mock implementation
+    return getDefaultSettings();
   } catch (error) {
     console.error("Error in getSiteSettings:", error);
     return getDefaultSettings();
@@ -68,83 +45,18 @@ export async function updateSiteSettings(
   settings: SiteSettings,
 ): Promise<SiteSettings | null> {
   try {
-    console.log("Updating site settings:", settings);
+    console.log("Mock updating site settings:", settings);
 
-    // Check if settings exist
-    const { data: existingData, error: checkError } = await supabase
-      .from("site_settings")
-      .select("id")
-      .limit(1);
-
-    if (checkError) {
-      console.log(
-        "Error checking existing settings, will try insert:",
-        checkError,
-      );
-    }
-
-    // Convert socialLinks to a format Supabase can store (JSON string)
-    const formattedSettings = {
-      title: settings.title,
-      owner_name: settings.ownerName,
-      email: settings.email,
-      phone: settings.phone,
-      location: settings.location,
-      about: settings.about,
-      hero_title: settings.heroTitle,
-      hero_description: settings.heroDescription,
-      hero_image_url: settings.heroImageUrl,
-      social_links: settings.socialLinks,
-      updated_at: new Date().toISOString(),
+    // In a real implementation, this would update the database
+    // For now, we'll just return the settings with an updated timestamp
+    const updatedSettings = {
+      ...settings,
+      updatedAt: new Date().toISOString(),
+      id: settings.id || "mock-settings-1",
     };
 
-    console.log("Formatted settings for Supabase:", formattedSettings);
-    let result;
-
-    if (existingData && existingData.length > 0) {
-      console.log("Updating existing settings with ID:", existingData[0].id);
-      // Update existing settings
-      result = await supabase
-        .from("site_settings")
-        .update(formattedSettings)
-        .eq("id", existingData[0].id)
-        .select();
-    } else {
-      console.log("Inserting new settings");
-      // Insert new settings
-      result = await supabase
-        .from("site_settings")
-        .insert([formattedSettings])
-        .select();
-    }
-
-    if (result.error) {
-      console.error("Error updating site settings:", result.error.message);
-      return null;
-    }
-
-    console.log("Settings updated successfully:", result.data);
-
-    // Convert the returned data back to our SiteSettings format
-    if (result.data && result.data[0]) {
-      const data = result.data[0];
-      return {
-        id: data.id,
-        title: data.title,
-        ownerName: data.owner_name,
-        email: data.email,
-        phone: data.phone,
-        location: data.location,
-        about: data.about,
-        heroTitle: data.hero_title,
-        heroDescription: data.hero_description,
-        heroImageUrl: data.hero_image_url,
-        socialLinks: data.social_links,
-        updatedAt: data.updated_at,
-      };
-    }
-
-    return null;
+    console.log("Updated mock settings:", updatedSettings);
+    return updatedSettings;
   } catch (error) {
     console.error("Error in updateSiteSettings:", error);
     return null;

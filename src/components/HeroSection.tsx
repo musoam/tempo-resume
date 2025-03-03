@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { ArrowDown } from "lucide-react";
 import { Button } from "./ui/button";
 import { getSiteSettings } from "@/lib/settings";
+import { useMockData } from "./MockDataProvider";
 
 interface HeroSectionProps {
   name?: string;
@@ -35,23 +36,17 @@ const HeroSection = ({
       "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=2070",
   });
 
-  useEffect(() => {
-    const loadSettings = async () => {
-      try {
-        const siteSettings = await getSiteSettings();
-        setSettings({
-          name: name || siteSettings.ownerName,
-          title: title || siteSettings.heroTitle,
-          description: description || siteSettings.heroDescription,
-          backgroundImage: backgroundImage || siteSettings.heroImageUrl,
-        });
-      } catch (error) {
-        console.error("Error loading hero settings:", error);
-      }
-    };
+  // Get the siteSettings directly from the context
+  const { siteSettings } = useMockData();
 
-    loadSettings();
-  }, [name, title, description, backgroundImage]);
+  useEffect(() => {
+    setSettings({
+      name: name || siteSettings.ownerName,
+      title: title || siteSettings.heroTitle,
+      description: description || siteSettings.heroDescription,
+      backgroundImage: backgroundImage || siteSettings.heroImageUrl,
+    });
+  }, [name, title, description, backgroundImage, siteSettings]);
   return (
     <section className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-gray-900">
       {/* Background with overlay */}

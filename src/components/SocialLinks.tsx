@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useMockData } from "./MockDataProvider";
 import {
   Github,
   Twitter,
@@ -78,27 +79,22 @@ const SocialLinks = ({
 }: SocialLinksProps) => {
   const [links, setLinks] = useState(initialLinks);
 
+  // Get the useMockData hook
+
+  // Get the siteSettings directly from the context
+  const { siteSettings } = useMockData();
+
   useEffect(() => {
-    const loadSocialLinks = async () => {
-      try {
-        const settings = await getSiteSettings();
+    if (siteSettings.socialLinks && siteSettings.socialLinks.length > 0) {
+      const formattedLinks = siteSettings.socialLinks.map((link) => ({
+        name: link.name,
+        icon: getIconByName(link.icon),
+        url: link.url,
+      }));
 
-        if (settings.socialLinks && settings.socialLinks.length > 0) {
-          const formattedLinks = settings.socialLinks.map((link) => ({
-            name: link.name,
-            icon: getIconByName(link.icon),
-            url: link.url,
-          }));
-
-          setLinks(formattedLinks);
-        }
-      } catch (error) {
-        console.error("Error loading social links:", error);
-      }
-    };
-
-    loadSocialLinks();
-  }, []);
+      setLinks(formattedLinks);
+    }
+  }, [siteSettings]);
   return (
     <div
       className={`flex items-center justify-center space-x-4 bg-background p-4 ${className}`}
