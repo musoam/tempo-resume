@@ -41,13 +41,13 @@ const ImageGallery = ({
         `Fetching images from bucket: ${bucket}, path: ${path || "root"}`,
       );
 
+      // Import the listFiles function
+      const { listFiles } = await import("@/lib/supabase-storage");
+
       // Fetch images from Supabase
       const files = await listFiles(bucket, path);
 
-      if (!files) {
-        throw new Error("Failed to fetch images");
-      }
-
+      // Convert to our format
       const imageItems = files.map((file) => ({
         name: file.name,
         url: file.url,
@@ -77,6 +77,9 @@ const ImageGallery = ({
 
     setDeleting(imageName);
     try {
+      // Import the deleteFile function
+      const { deleteFile } = await import("@/lib/supabase-storage");
+
       const filePath = path ? `${path}/${imageName}` : imageName;
       const success = await deleteFile(filePath, bucket);
 
@@ -174,31 +177,43 @@ const ImageGallery = ({
                   transition={{ duration: 0.3, delay: index * 0.05 }}
                   className={`relative group aspect-square rounded-md overflow-hidden border ${selectedImage === image.url ? "ring-2 ring-primary" : ""}`}
                 >
-                  <div
-                    className="w-full h-full cursor-pointer"
-                    onClick={() => {
-                      console.log("Image clicked:", image.url);
-                      onSelect(image.url);
-                      setSelectedImage(image.url);
-                      setShowUploader(false);
-                    }}
-                  >
-                    <img
-                      src={image.url}
-                      alt={image.name}
-                      className="w-full h-full object-cover"
-                    />
+                  <div className="w-full h-full cursor-pointer flex flex-col">
+                    <div className="flex-grow">
+                      <img
+                        src={image.url}
+                        alt={image.name}
+                        className="w-full h-full object-cover"
+                        onClick={() => {
+                          console.log("Image clicked:", image.url);
+                          onSelect(image.url);
+                          setSelectedImage(image.url);
+                          setShowUploader(false);
+                        }}
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      className="w-full py-2 px-2 bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium"
+                      onClick={() => {
+                        console.log("Select button clicked:", image.url);
+                        onSelect(image.url);
+                        setSelectedImage(image.url);
+                        setShowUploader(false);
+                      }}
+                    >
+                      Select
+                    </button>
                   </div>
 
                   {editable && (
-                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                    <div className="absolute top-0 right-0 p-2">
                       {deleting === image.name ? (
                         <Loader2 className="h-6 w-6 text-white animate-spin" />
                       ) : (
                         <Button
                           variant="destructive"
                           size="icon"
-                          className="h-8 w-8"
+                          className="h-8 w-8 rounded-full bg-black/50 hover:bg-black/70"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleDeleteImage(image.name);

@@ -87,7 +87,14 @@ const FileUploader = ({
 
       // Import the uploadFile function
       const { uploadFile } = await import("@/lib/supabase-storage");
-      const fileUrl = await uploadFile(file, bucket, path);
+
+      // Create a unique filename to avoid collisions
+      const timestamp = new Date().getTime();
+      const fileExtension = file.name.split(".").pop();
+      const uniqueFileName = `${timestamp}-${file.name}`;
+      const uniqueFile = new File([file], uniqueFileName, { type: file.type });
+
+      const fileUrl = await uploadFile(uniqueFile, bucket, path);
 
       if (fileUrl) {
         console.log("Upload successful, URL:", fileUrl);

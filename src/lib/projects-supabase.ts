@@ -10,7 +10,7 @@ export async function getProjects(): Promise<Project[] | null> {
     const { data, error } = await supabase
       .from("projects")
       .select("*")
-      .order("createdAt", { ascending: false });
+      .order("year", { ascending: false });
 
     if (error) throw error;
     return data as Project[];
@@ -76,13 +76,18 @@ export async function createProject(
       projectData.slug || projectData.title.toLowerCase().replace(/\s+/g, "-");
 
     // Format the images array for storage
-    const images = projectData.images.map((img, index) => ({
-      src: img,
-      alt: `${projectData.title} image ${index + 1}`,
-    }));
+    const images = Array.isArray(projectData.images)
+      ? projectData.images.map((img, index) => ({
+          src: img,
+          alt: `${projectData.title} image ${index + 1}`,
+        }))
+      : [];
 
     // Format tags into an array
-    const tags = projectData.tags ? projectData.tags.split(",") : [];
+    const tags =
+      typeof projectData.tags === "string" && projectData.tags
+        ? projectData.tags.split(",")
+        : [];
 
     // Create technologies array from tags
     const technologies = tags.map((tag) => ({
@@ -90,35 +95,68 @@ export async function createProject(
       color: getColorForTag(tag),
     }));
 
-    // Create a new project
+    // Create a new project with minimal data structure
     const newProject = {
       title: projectData.title,
       description: projectData.description,
       imageUrl: projectData.imageUrl,
-      tags,
-      demoUrl: projectData.demoUrl || undefined,
-      githubUrl: projectData.githubUrl || undefined,
       year: projectData.year,
       category: projectData.category,
-      images,
-      technologies,
-      displayType: projectData.displayType || "popup",
       slug,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
     };
 
+    console.log("Creating new project with data:", JSON.stringify(newProject));
+
+    // Insert the new project
     const { data, error } = await supabase
       .from("projects")
       .insert([newProject])
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error("Insert error:", error);
+      throw error;
+    }
+
+    // Now update with the complex fields
+    if (data && data.id) {
+      const updateData = {
+        tags,
+        demoUrl: projectData.demoUrl || null,
+        videoUrl: projectData.videoUrl || null,
+        projectRole: projectData.projectRole || null,
+        images,
+        technologies,
+        technicalDetails: projectData.technicalDetails || null,
+        projectChallenges: projectData.projectChallenges || null,
+        implementationDetails: projectData.implementationDetails || null,
+      };
+
+      const { data: updatedData, error: updateError } = await supabase
+        .from("projects")
+        .update(updateData)
+        .eq("id", data.id)
+        .select()
+        .single();
+
+      if (updateError) {
+        console.error("Update error:", updateError);
+        // Continue anyway, we at least created the basic project
+      }
+
+      console.log(
+        "Project created and updated successfully:",
+        updatedData || data,
+      );
+      return updatedData || (data as Project);
+    }
+
+    console.log("Project created successfully:", data);
     return data as Project;
   } catch (error) {
     console.error("Error in createProject:", error);
-    return null;
+    throw error; // Re-throw to show the actual error message
   }
 }
 
@@ -138,13 +176,18 @@ export async function updateProject(
       projectData.slug || projectData.title.toLowerCase().replace(/\s+/g, "-");
 
     // Format the images array for storage
-    const images = projectData.images.map((img, index) => ({
-      src: img,
-      alt: `${projectData.title} image ${index + 1}`,
-    }));
+    const images = Array.isArray(projectData.images)
+      ? projectData.images.map((img, index) => ({
+          src: img,
+          alt: `${projectData.title} image ${index + 1}`,
+        }))
+      : [];
 
     // Format tags into an array
-    const tags = projectData.tags ? projectData.tags.split(",") : [];
+    const tags =
+      typeof projectData.tags === "string" && projectData.tags
+        ? projectData.tags.split(",")
+        : [];
 
     // Create technologies array from tags
     const technologies = tags.map((tag) => ({
@@ -158,17 +201,22 @@ export async function updateProject(
       description: projectData.description,
       imageUrl: projectData.imageUrl,
       tags,
-      demoUrl: projectData.demoUrl || undefined,
-      githubUrl: projectData.githubUrl || undefined,
+      demoUrl: projectData.demoUrl || null,
+      videoUrl: projectData.videoUrl || null,
+      projectRole: projectData.projectRole || null,
       year: projectData.year,
       category: projectData.category,
       images,
       technologies,
       displayType: projectData.displayType || "popup",
       slug,
+      technicalDetails: projectData.technicalDetails || null,
+      projectChallenges: projectData.projectChallenges || null,
+      implementationDetails: projectData.implementationDetails || null,
       updatedAt: new Date().toISOString(),
     };
 
+    // Update in Supabase
     const { data, error } = await supabase
       .from("projects")
       .update(updatedProject)
@@ -176,7 +224,12 @@ export async function updateProject(
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error("Update error:", error);
+      throw error;
+    }
+
+    console.log("Updated project in Supabase:", data);
     return data as Project;
   } catch (error) {
     console.error("Error in updateProject:", error);
@@ -191,9 +244,13 @@ export async function updateProject(
  */
 export async function deleteProject(id: string): Promise<boolean> {
   try {
+    console.log(`Deleting project ${id} from Supabase`);
     const { error } = await supabase.from("projects").delete().eq("id", id);
 
-    if (error) throw error;
+    if (error) {
+      throw error;
+    }
+
     return true;
   } catch (error) {
     console.error("Error in deleteProject:", error);

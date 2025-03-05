@@ -74,7 +74,7 @@ const Navigation = ({
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.5 }}
-        className={`fixed top-0 left-0 right-0 z-50 ${scrolled ? "bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm shadow-md" : "bg-transparent"} transition-all duration-300 ${className}`}
+        className={`fixed top-0 left-0 right-0 z-50 ${scrolled ? "bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm shadow-md" : "bg-transparent"} transition-all duration-300 ${className}`}
       >
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <a href="#home" className="flex items-center space-x-2">
@@ -91,7 +91,7 @@ const Navigation = ({
                 <a
                   key={index}
                   href={link.href}
-                  className="text-gray-700 dark:text-gray-200 hover:text-primary transition-colors duration-300 font-medium"
+                  className="text-gray-900 dark:text-gray-100 hover:text-primary transition-colors duration-300 font-medium"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -105,7 +105,7 @@ const Navigation = ({
                     e.preventDefault();
                     scrollToSection(link.href);
                   }}
-                  className="text-gray-700 dark:text-gray-200 hover:text-primary transition-colors duration-300 font-medium"
+                  className="text-gray-900 dark:text-gray-100 hover:text-primary transition-colors duration-300 font-medium"
                 >
                   {link.name}
                 </a>

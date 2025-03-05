@@ -14,11 +14,15 @@ interface Project {
   imageUrl: string;
   tags: string[];
   demoUrl?: string;
-  githubUrl?: string;
+  videoUrl?: string;
+  projectRole?: string;
   year: string;
   category: string;
   images: Array<{ src: string; alt: string }>;
   technologies: Array<{ name: string; color?: string }>;
+  technicalDetails?: string;
+  projectChallenges?: string;
+  implementationDetails?: string;
 }
 
 interface PortfolioSectionProps {
@@ -31,7 +35,12 @@ interface PortfolioSectionProps {
 const PortfolioSection = ({
   title = "My Portfolio",
   subtitle = "Check out some of my recent projects and creative work",
-  categories = ["All", "Web Development", "UI/UX Design", "Mobile Apps"],
+  categories = [
+    "All",
+    "Business-to-Business (B2B)",
+    "Direct-to-Consumer (DTC)",
+    "E-Commerce & Retail Marketing",
+  ],
   projects: initialProjects,
 }: PortfolioSectionProps) => {
   // Use the MockDataProvider to get projects
@@ -62,10 +71,17 @@ const PortfolioSection = ({
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Sort projects by year (newest first)
+  const sortedProjects = [...projects].sort((a, b) => {
+    return parseInt(b.year) - parseInt(a.year);
+  });
+
   const filteredProjects =
     selectedCategory === "All"
-      ? projects
-      : projects.filter((project) => project.category === selectedCategory);
+      ? sortedProjects
+      : sortedProjects.filter(
+          (project) => project.category === selectedCategory,
+        );
 
   const handleViewDetails = (id: string) => {
     const project = projects.find((p) => p.id === id);
@@ -146,8 +162,12 @@ const PortfolioSection = ({
             images={selectedProject.images}
             technologies={selectedProject.technologies}
             liveUrl={selectedProject.demoUrl}
-            githubUrl={selectedProject.githubUrl}
+            videoUrl={selectedProject.videoUrl}
             year={selectedProject.year}
+            projectRole={selectedProject.projectRole}
+            technicalDetails={selectedProject.technicalDetails}
+            projectChallenges={selectedProject.projectChallenges}
+            implementationDetails={selectedProject.implementationDetails}
           />
         )}
       </div>

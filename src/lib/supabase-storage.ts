@@ -13,6 +13,9 @@ export async function uploadFile(
   path?: string,
 ): Promise<string | null> {
   try {
+    // Create the bucket if it doesn't exist
+    await createBucketIfNotExists(bucket);
+
     const filePath = path ? `${path}/${file.name}` : file.name;
     console.log(`Uploading file to ${bucket}/${filePath}`);
 
@@ -35,6 +38,45 @@ export async function uploadFile(
   } catch (error) {
     console.error("Error in uploadFile:", error);
     return null;
+  }
+}
+
+/**
+ * Creates a bucket if it doesn't exist
+ * @param bucketName The name of the bucket to create
+ * @returns Success status
+ */
+async function createBucketIfNotExists(bucketName: string): Promise<boolean> {
+  try {
+    // Check if bucket exists
+    const { data: buckets, error: listError } =
+      await supabase.storage.listBuckets();
+
+    if (listError) {
+      console.error("Error listing buckets:", listError);
+      return false;
+    }
+
+    const bucketExists = buckets.some((bucket) => bucket.name === bucketName);
+
+    if (!bucketExists) {
+      // Create the bucket
+      const { error } = await supabase.storage.createBucket(bucketName, {
+        public: true, // Make bucket public
+      });
+
+      if (error) {
+        console.error("Error creating bucket:", error);
+        return false;
+      }
+
+      console.log(`Bucket '${bucketName}' created successfully`);
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Error in createBucketIfNotExists:", error);
+    return false;
   }
 }
 
@@ -68,6 +110,9 @@ export async function deleteFile(
  */
 export async function listFiles(bucket: string = "portfolio", path?: string) {
   try {
+    // Create the bucket if it doesn't exist
+    await createBucketIfNotExists(bucket);
+
     const { data, error } = await supabase.storage
       .from(bucket)
       .list(path || "", {
@@ -78,9 +123,14 @@ export async function listFiles(bucket: string = "portfolio", path?: string) {
       throw error;
     }
 
+    // If no data or empty array, return empty array
+    if (!data || data.length === 0) {
+      return [];
+    }
+
     // Filter out folders and map to a simpler format
     const files = data
-      .filter((item) => !item.id.endsWith("/"))
+      .filter((item) => !item.name.endsWith("/"))
       .map((item) => {
         const { data: urlData } = supabase.storage
           .from(bucket)
@@ -96,6 +146,6 @@ export async function listFiles(bucket: string = "portfolio", path?: string) {
     return files;
   } catch (error) {
     console.error("Error in listFiles:", error);
-    return null;
+    return [];
   }
 }

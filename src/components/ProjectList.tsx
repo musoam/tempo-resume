@@ -5,7 +5,7 @@ import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Separator } from "./ui/separator";
-import { getProjects, deleteProject } from "@/lib/projects";
+import { getProjects, deleteProject } from "@/lib/projects-supabase";
 import { Project } from "@/types/project";
 import { useNavigate } from "react-router-dom";
 import { useMockData } from "./MockDataProvider";
@@ -18,7 +18,7 @@ const ProjectList = ({ onEditProject }: ProjectListProps) => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const fetchProjects = async () => {
     setLoading(true);
@@ -101,7 +101,7 @@ const ProjectList = ({ onEditProject }: ProjectListProps) => {
           </Button>
           <Button
             size="sm"
-            onClick={() => navigate("/admin/projects/new")}
+            onClick={() => onEditProject(null)}
             className="flex items-center gap-1"
           >
             <Plus className="h-4 w-4" />
@@ -121,7 +121,7 @@ const ProjectList = ({ onEditProject }: ProjectListProps) => {
           <Button
             variant="outline"
             className="mt-4"
-            onClick={() => navigate("/admin/projects/new")}
+            onClick={() => onEditProject(null)}
           >
             Create your first project
           </Button>
@@ -230,12 +230,7 @@ const ProjectList = ({ onEditProject }: ProjectListProps) => {
                             variant="ghost"
                             size="sm"
                             className="h-8 text-xs"
-                            onClick={() =>
-                              window.open(
-                                `/project/${project.slug || project.id}`,
-                                "_blank",
-                              )
-                            }
+                            onClick={() => {}}
                           >
                             <Eye className="h-3 w-3 mr-1" />
                             Preview

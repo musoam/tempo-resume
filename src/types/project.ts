@@ -5,13 +5,17 @@ export interface Project {
   imageUrl: string;
   tags: string[];
   demoUrl?: string;
-  githubUrl?: string;
+  videoUrl?: string;
+  projectRole?: string;
   year: string;
   category: string;
   images: Array<{ src: string; alt: string }>;
   technologies: Array<{ name: string; color?: string }>;
   displayType: "popup" | "page";
   slug?: string;
+  technicalDetails?: string;
+  projectChallenges?: string;
+  implementationDetails?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -21,11 +25,15 @@ export interface ProjectFormData {
   description: string;
   tags: string;
   demoUrl?: string;
-  githubUrl?: string;
+  videoUrl?: string;
+  projectRole?: string;
   year: string;
   category: string;
   imageUrl: string;
   images: string[];
   displayType: "popup" | "page";
   slug?: string;
+  technicalDetails?: string;
+  projectChallenges?: string;
+  implementationDetails?: string;
 }

@@ -31,8 +31,12 @@ interface ProjectModalProps {
   images?: ProjectImage[];
   technologies?: Technology[];
   liveUrl?: string;
-  githubUrl?: string;
+  videoUrl?: string;
   year?: string;
+  technicalDetails?: string;
+  projectChallenges?: string;
+  implementationDetails?: string;
+  projectRole?: string;
 }
 
 const ProjectModal = ({
@@ -62,8 +66,12 @@ const ProjectModal = ({
     { name: "Vite", color: "bg-yellow-100 text-yellow-800" },
   ],
   liveUrl = "https://example.com",
-  githubUrl = "https://github.com/example/portfolio",
+  videoUrl,
   year = "2023",
+  projectRole,
+  technicalDetails,
+  projectChallenges,
+  implementationDetails,
 }: ProjectModalProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -92,6 +100,11 @@ const ProjectModal = ({
           </div>
           <div className="flex items-center gap-2 mt-2">
             <span className="text-sm text-gray-500">{year}</span>
+            {projectRole && (
+              <span className="text-sm bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                {projectRole}
+              </span>
+            )}
           </div>
         </div>
 
@@ -99,8 +112,8 @@ const ProjectModal = ({
           <Tabs defaultValue="overview" className="w-full">
             <TabsList className="mb-4">
               <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="gallery">Gallery</TabsTrigger>
               <TabsTrigger value="technical">Technical Details</TabsTrigger>
+              <TabsTrigger value="gallery">Gallery</TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview" className="space-y-4">
@@ -193,31 +206,103 @@ const ProjectModal = ({
 
             <TabsContent value="technical" className="space-y-4">
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Technologies Used</h3>
+                <h3 className="text-lg font-medium">Industr</h3>
                 <ul className="list-disc pl-5 space-y-2">
                   {technologies.map((tech, index) => (
                     <li key={index}>{tech.name}</li>
                   ))}
                 </ul>
 
-                <h3 className="text-lg font-medium mt-6">Project Challenges</h3>
-                <p className="text-gray-700">
-                  The main challenges in this project included implementing
-                  smooth animations that work across different devices, creating
-                  a responsive layout that maintains visual appeal on all screen
-                  sizes, and optimizing image loading for performance.
-                </p>
+                {/* Marketing Tech Stack */}
+                {technicalDetails ? (
+                  <div className="mt-6">
+                    <h3 className="text-lg font-medium">
+                      Marketing Tech Stack
+                    </h3>
+                    <div
+                      className="text-gray-700 prose prose-sm max-w-none"
+                      dangerouslySetInnerHTML={{
+                        __html: technicalDetails
+                          .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+                          .replace(/\*(.+?)\*/g, "<em>$1</em>")
+                          .replace(/^- (.+)$/gm, "<li>$1</li>")
+                          .replace(/(<li>.+<\/li>)/g, "<ul>$1</ul>")
+                          .replace(/^\d+\. (.+)$/gm, "<li>$1</li>")
+                          .replace(/(<li>.+<\/li>)/g, "<ol>$1</ol>")
+                          .replace(/\n/g, "<br/>"),
+                      }}
+                    />
+                  </div>
+                ) : null}
 
-                <h3 className="text-lg font-medium mt-6">
-                  Implementation Details
-                </h3>
-                <p className="text-gray-700">
-                  The portfolio was built using React with TypeScript for type
-                  safety. Tailwind CSS was used for styling, with custom
-                  animations implemented through Framer Motion. The site is
-                  fully responsive and features optimized image loading with
-                  lazy loading techniques.
-                </p>
+                {/* Market & Execution Challenges */}
+                {projectChallenges ? (
+                  <div className="mt-6">
+                    <h3 className="text-lg font-medium">
+                      Market & Execution Challenges
+                    </h3>
+                    <div
+                      className="text-gray-700 prose prose-sm max-w-none"
+                      dangerouslySetInnerHTML={{
+                        __html: projectChallenges
+                          .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+                          .replace(/\*(.+?)\*/g, "<em>$1</em>")
+                          .replace(/^- (.+)$/gm, "<li>$1</li>")
+                          .replace(/(<li>.+<\/li>)/g, "<ul>$1</ul>")
+                          .replace(/^\d+\. (.+)$/gm, "<li>$1</li>")
+                          .replace(/(<li>.+<\/li>)/g, "<ol>$1</ol>")
+                          .replace(/\n/g, "<br/>"),
+                      }}
+                    />
+                  </div>
+                ) : null}
+
+                {/* Go-to-Market Strategy & Execution */}
+                {implementationDetails ? (
+                  <div className="mt-6">
+                    <h3 className="text-lg font-medium">
+                      Go-to-Market Strategy & Execution
+                    </h3>
+                    <div
+                      className="text-gray-700 prose prose-sm max-w-none"
+                      dangerouslySetInnerHTML={{
+                        __html: implementationDetails
+                          .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+                          .replace(/\*(.+?)\*/g, "<em>$1</em>")
+                          .replace(/^- (.+)$/gm, "<li>$1</li>")
+                          .replace(/(<li>.+<\/li>)/g, "<ul>$1</ul>")
+                          .replace(/^\d+\. (.+)$/gm, "<li>$1</li>")
+                          .replace(/(<li>.+<\/li>)/g, "<ol>$1</ol>")
+                          .replace(/\n/g, "<br/>"),
+                      }}
+                    />
+                  </div>
+                ) : null}
+
+                {/* Video Section */}
+                {videoUrl && (
+                  <div className="mt-6">
+                    <h3 className="text-lg font-medium">Project Video</h3>
+                    <div className="aspect-video mt-2 rounded-md overflow-hidden">
+                      <iframe
+                        src={
+                          videoUrl.includes("youtube.com")
+                            ? videoUrl.replace("watch?v=", "embed/")
+                            : videoUrl.includes("vimeo.com")
+                              ? videoUrl.replace(
+                                  "vimeo.com",
+                                  "player.vimeo.com/video",
+                                )
+                              : videoUrl
+                        }
+                        className="w-full h-full"
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      ></iframe>
+                    </div>
+                  </div>
+                )}
               </div>
             </TabsContent>
           </Tabs>
@@ -230,24 +315,6 @@ const ProjectModal = ({
                 <a href={liveUrl} target="_blank" rel="noopener noreferrer">
                   <ExternalLink className="mr-2 h-4 w-4" />
                   View Live Site
-                </a>
-              </Button>
-            )}
-            {githubUrl && (
-              <Button variant="outline" asChild className="flex-1">
-                <a href={githubUrl} target="_blank" rel="noopener noreferrer">
-                  <svg
-                    className="mr-2 h-4 w-4"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M12 2C6.477 2 2 6.477 2 12C2 16.418 4.865 20.166 8.84 21.49C9.34 21.581 9.52 21.272 9.52 21.007C9.52 20.719 9.514 20.061 9.51 19.191C6.73 19.792 6.14 17.81 6.14 17.81C5.68 16.636 5.03 16.327 5.03 16.327C4.12 15.693 5.1 15.707 5.1 15.707C6.1 15.777 6.63 16.754 6.63 16.754C7.5 18.328 8.97 17.858 9.54 17.602C9.63 16.965 9.89 16.495 10.17 16.219C7.88 15.941 5.48 15.055 5.48 11.258C5.48 10.143 5.89 9.231 6.65 8.517C6.55 8.265 6.2 7.278 6.75 5.962C6.75 5.962 7.57 5.695 9.5 6.926C10.29 6.706 11.15 6.595 12 6.59C12.85 6.595 13.71 6.706 14.5 6.926C16.43 5.695 17.25 5.962 17.25 5.962C17.8 7.278 17.45 8.265 17.35 8.517C18.11 9.231 18.52 10.143 18.52 11.258C18.52 15.065 16.12 15.939 13.82 16.211C14.17 16.551 14.5 17.227 14.5 18.252C14.5 19.703 14.49 20.626 14.49 21.007C14.49 21.275 14.67 21.587 15.18 21.487C19.158 20.161 22 16.416 22 12C22 6.477 17.523 2 12 2Z"
-                      fill="currentColor"
-                    />
-                  </svg>
-                  View Source Code
                 </a>
               </Button>
             )}

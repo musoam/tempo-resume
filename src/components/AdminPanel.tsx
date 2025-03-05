@@ -100,13 +100,20 @@ const AdminPanel = () => {
                           description: selectedProject.description,
                           tags: selectedProject.tags.join(","),
                           demoUrl: selectedProject.demoUrl || "",
-                          githubUrl: selectedProject.githubUrl || "",
+                          videoUrl: selectedProject.videoUrl || "",
+                          projectRole: selectedProject.projectRole || "",
                           year: selectedProject.year,
                           category: selectedProject.category,
                           imageUrl: selectedProject.imageUrl,
                           images: selectedProject.images.map((img) => img.src),
                           displayType: selectedProject.displayType,
                           slug: selectedProject.slug,
+                          technicalDetails:
+                            selectedProject.technicalDetails || "",
+                          projectChallenges:
+                            selectedProject.projectChallenges || "",
+                          implementationDetails:
+                            selectedProject.implementationDetails || "",
                         }
                       : {}
                   }
@@ -132,12 +139,42 @@ const AdminPanel = () => {
                         }
                       } else {
                         // Create new project
-                        const created = await createProject(values);
-                        if (created) {
-                          alert("Project created successfully!");
-                          setIsEditingProject(false);
-                        } else {
-                          throw new Error("Failed to create project");
+                        console.log(
+                          "Creating new project with values:",
+                          values,
+                        );
+                        try {
+                          // First make sure the storage buckets exist
+                          const { createStorageBuckets } = await import(
+                            "@/lib/create-storage-function"
+                          );
+                          const bucketsCreated = await createStorageBuckets();
+                          console.log(
+                            "Storage buckets created:",
+                            bucketsCreated,
+                          );
+
+                          // Then create the project
+                          console.log(
+                            "Creating project with values:",
+                            JSON.stringify(values),
+                          );
+                          const created = await createProject(values);
+                          console.log("Project creation result:", created);
+
+                          if (created) {
+                            alert("Project created successfully!");
+                            setIsEditingProject(false);
+                          } else {
+                            throw new Error(
+                              "Failed to create project - null result returned",
+                            );
+                          }
+                        } catch (createError) {
+                          console.error("Error creating project:", createError);
+                          alert(
+                            `Error creating project: ${createError.message || "Unknown error"}`,
+                          );
                         }
                       }
                     } catch (error) {

@@ -39,17 +39,21 @@ const projectSchema = z.object({
     .url({ message: "Please enter a valid URL" })
     .optional()
     .or(z.literal("")),
-  githubUrl: z
+  videoUrl: z
     .string()
     .url({ message: "Please enter a valid URL" })
     .optional()
     .or(z.literal("")),
+  projectRole: z.string().optional(),
   year: z
     .string()
     .regex(/^\d{4}$/, { message: "Year must be a 4-digit number" }),
   category: z.string().min(1, { message: "Please select a category" }),
   displayType: z.enum(["popup", "page"]),
   slug: z.string().optional(),
+  technicalDetails: z.string().optional(),
+  projectChallenges: z.string().optional(),
+  implementationDetails: z.string().optional(),
 });
 
 type ProjectFormValues = z.infer<typeof projectSchema>;
@@ -68,7 +72,11 @@ interface ProjectFormProps {
 const ProjectForm = ({
   onSubmit = () => {},
   initialValues = {},
-  categories = ["Web Development", "UI/UX Design", "Mobile Apps"],
+  categories = [
+    "Business-to-Business (B2B)",
+    "Direct-to-Consumer (DTC)",
+    "E-Commerce & Retail Marketing",
+  ],
   className = "",
 }: ProjectFormProps) => {
   const [tags, setTags] = useState<string[]>(
@@ -90,11 +98,15 @@ const ProjectForm = ({
       description: initialValues.description || "",
       tags: initialValues.tags || "",
       demoUrl: initialValues.demoUrl || "",
-      githubUrl: initialValues.githubUrl || "",
+      videoUrl: initialValues.videoUrl || "",
+      projectRole: initialValues.projectRole || "",
       year: initialValues.year || new Date().getFullYear().toString(),
       category: initialValues.category || categories[0],
       displayType: initialValues.displayType || "popup",
       slug: initialValues.slug || "",
+      technicalDetails: initialValues.technicalDetails || "",
+      projectChallenges: initialValues.projectChallenges || "",
+      implementationDetails: initialValues.implementationDetails || "",
     },
   });
 
@@ -145,12 +157,18 @@ const ProjectForm = ({
     }
 
     try {
+      // Make sure we have unique images
+      const uniqueAdditionalImages = additionalImages.filter(
+        (img) => img !== mainImage,
+      );
+
       const projectData = {
         ...values,
         imageUrl: mainImage,
-        images: [mainImage, ...additionalImages],
+        images: [mainImage, ...uniqueAdditionalImages],
       };
 
+      console.log("Submitting project data:", projectData);
       onSubmit(projectData);
     } catch (error) {
       console.error("Error in handleSubmit:", error);
@@ -289,16 +307,19 @@ const ProjectForm = ({
 
               <FormField
                 control={form.control}
-                name="githubUrl"
+                name="videoUrl"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>GitHub URL</FormLabel>
+                    <FormLabel>Video URL</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="https://github.com/username/repo"
+                        placeholder="https://youtube.com/watch?v=..."
                         {...field}
                       />
                     </FormControl>
+                    <FormDescription>
+                      YouTube, Vimeo or other video platform URL
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -332,6 +353,26 @@ const ProjectForm = ({
 
               <FormField
                 control={form.control}
+                name="projectRole"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Your Role</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Product Marketing Manager"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Your role or position in this project
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
                 name="slug"
                 render={({ field }) => (
                   <FormItem>
@@ -348,6 +389,426 @@ const ProjectForm = ({
                 )}
               />
             </div>
+          </div>
+
+          <div className="space-y-6">
+            <h3 className="text-lg font-medium">Marketing Information</h3>
+
+            <FormField
+              control={form.control}
+              name="technicalDetails"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Marketing Tech Stack</FormLabel>
+                  <FormControl>
+                    <div className="border rounded-md">
+                      <div className="flex flex-wrap gap-1 p-1 border-b">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs h-8"
+                          onClick={() => {
+                            const textarea = document.getElementById(
+                              "marketing-tech-stack",
+                            );
+                            if (textarea) {
+                              const start = textarea.selectionStart;
+                              const end = textarea.selectionEnd;
+                              const value = field.value;
+                              const newValue =
+                                value.substring(0, start) +
+                                "**Bold Text**" +
+                                value.substring(end);
+                              field.onChange(newValue);
+                            }
+                          }}
+                        >
+                          <strong>B</strong>
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs h-8 italic"
+                          onClick={() => {
+                            const textarea = document.getElementById(
+                              "marketing-tech-stack",
+                            );
+                            if (textarea) {
+                              const start = textarea.selectionStart;
+                              const end = textarea.selectionEnd;
+                              const value = field.value;
+                              const newValue =
+                                value.substring(0, start) +
+                                "*Italic Text*" +
+                                value.substring(end);
+                              field.onChange(newValue);
+                            }
+                          }}
+                        >
+                          <em>I</em>
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs h-8"
+                          onClick={() => {
+                            const textarea = document.getElementById(
+                              "marketing-tech-stack",
+                            );
+                            if (textarea) {
+                              const start = textarea.selectionStart;
+                              const end = textarea.selectionEnd;
+                              const value = field.value;
+                              const newValue =
+                                value.substring(0, start) +
+                                "\n- " +
+                                value.substring(start);
+                              field.onChange(newValue);
+                            }
+                          }}
+                        >
+                          • List
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs h-8"
+                          onClick={() => {
+                            const textarea = document.getElementById(
+                              "marketing-tech-stack",
+                            );
+                            if (textarea) {
+                              const start = textarea.selectionStart;
+                              const end = textarea.selectionEnd;
+                              const value = field.value;
+                              const newValue =
+                                value.substring(0, start) +
+                                "\n1. " +
+                                value.substring(start);
+                              field.onChange(newValue);
+                            }
+                          }}
+                        >
+                          1. Numbered
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs h-8"
+                          onClick={() => {
+                            const textarea = document.getElementById(
+                              "marketing-tech-stack",
+                            );
+                            if (textarea) {
+                              const start = textarea.selectionStart;
+                              const end = textarea.selectionEnd;
+                              const value = field.value;
+                              const newValue =
+                                value.substring(0, start) +
+                                "\n    " +
+                                value.substring(start);
+                              field.onChange(newValue);
+                            }
+                          }}
+                        >
+                          Indent
+                        </Button>
+                      </div>
+                      <Textarea
+                        id="marketing-tech-stack"
+                        placeholder="Outline the tools, platforms, and technologies used to execute this project (e.g., CRM, analytics, automation, ad platforms)."
+                        className="min-h-[100px] border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                        {...field}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormDescription>
+                    Outline the tools, platforms, and technologies used to
+                    execute this project
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="projectChallenges"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Market & Execution Challenges</FormLabel>
+                  <FormControl>
+                    <div className="border rounded-md">
+                      <div className="flex flex-wrap gap-1 p-1 border-b">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs h-8"
+                          onClick={() => {
+                            const textarea =
+                              document.getElementById("market-challenges");
+                            if (textarea) {
+                              const start = textarea.selectionStart;
+                              const end = textarea.selectionEnd;
+                              const value = field.value;
+                              const newValue =
+                                value.substring(0, start) +
+                                "**Bold Text**" +
+                                value.substring(end);
+                              field.onChange(newValue);
+                            }
+                          }}
+                        >
+                          <strong>B</strong>
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs h-8 italic"
+                          onClick={() => {
+                            const textarea =
+                              document.getElementById("market-challenges");
+                            if (textarea) {
+                              const start = textarea.selectionStart;
+                              const end = textarea.selectionEnd;
+                              const value = field.value;
+                              const newValue =
+                                value.substring(0, start) +
+                                "*Italic Text*" +
+                                value.substring(end);
+                              field.onChange(newValue);
+                            }
+                          }}
+                        >
+                          <em>I</em>
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs h-8"
+                          onClick={() => {
+                            const textarea =
+                              document.getElementById("market-challenges");
+                            if (textarea) {
+                              const start = textarea.selectionStart;
+                              const end = textarea.selectionEnd;
+                              const value = field.value;
+                              const newValue =
+                                value.substring(0, start) +
+                                "\n- " +
+                                value.substring(start);
+                              field.onChange(newValue);
+                            }
+                          }}
+                        >
+                          • List
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs h-8"
+                          onClick={() => {
+                            const textarea =
+                              document.getElementById("market-challenges");
+                            if (textarea) {
+                              const start = textarea.selectionStart;
+                              const end = textarea.selectionEnd;
+                              const value = field.value;
+                              const newValue =
+                                value.substring(0, start) +
+                                "\n1. " +
+                                value.substring(start);
+                              field.onChange(newValue);
+                            }
+                          }}
+                        >
+                          1. Numbered
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs h-8"
+                          onClick={() => {
+                            const textarea =
+                              document.getElementById("market-challenges");
+                            if (textarea) {
+                              const start = textarea.selectionStart;
+                              const end = textarea.selectionEnd;
+                              const value = field.value;
+                              const newValue =
+                                value.substring(0, start) +
+                                "\n    " +
+                                value.substring(start);
+                              field.onChange(newValue);
+                            }
+                          }}
+                        >
+                          Indent
+                        </Button>
+                      </div>
+                      <Textarea
+                        id="market-challenges"
+                        placeholder="Highlight challenges related to market positioning, messaging, adoption, or execution, and how you addressed them."
+                        className="min-h-[100px] border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                        {...field}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormDescription>
+                    Highlight challenges related to market positioning,
+                    messaging, adoption, or execution
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="implementationDetails"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Go-to-Market Strategy & Execution</FormLabel>
+                  <FormControl>
+                    <div className="border rounded-md">
+                      <div className="flex flex-wrap gap-1 p-1 border-b">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs h-8"
+                          onClick={() => {
+                            const textarea =
+                              document.getElementById("gtm-strategy");
+                            if (textarea) {
+                              const start = textarea.selectionStart;
+                              const end = textarea.selectionEnd;
+                              const value = field.value;
+                              const newValue =
+                                value.substring(0, start) +
+                                "**Bold Text**" +
+                                value.substring(end);
+                              field.onChange(newValue);
+                            }
+                          }}
+                        >
+                          <strong>B</strong>
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs h-8 italic"
+                          onClick={() => {
+                            const textarea =
+                              document.getElementById("gtm-strategy");
+                            if (textarea) {
+                              const start = textarea.selectionStart;
+                              const end = textarea.selectionEnd;
+                              const value = field.value;
+                              const newValue =
+                                value.substring(0, start) +
+                                "*Italic Text*" +
+                                value.substring(end);
+                              field.onChange(newValue);
+                            }
+                          }}
+                        >
+                          <em>I</em>
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs h-8"
+                          onClick={() => {
+                            const textarea =
+                              document.getElementById("gtm-strategy");
+                            if (textarea) {
+                              const start = textarea.selectionStart;
+                              const end = textarea.selectionEnd;
+                              const value = field.value;
+                              const newValue =
+                                value.substring(0, start) +
+                                "\n- " +
+                                value.substring(start);
+                              field.onChange(newValue);
+                            }
+                          }}
+                        >
+                          • List
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs h-8"
+                          onClick={() => {
+                            const textarea =
+                              document.getElementById("gtm-strategy");
+                            if (textarea) {
+                              const start = textarea.selectionStart;
+                              const end = textarea.selectionEnd;
+                              const value = field.value;
+                              const newValue =
+                                value.substring(0, start) +
+                                "\n1. " +
+                                value.substring(start);
+                              field.onChange(newValue);
+                            }
+                          }}
+                        >
+                          1. Numbered
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs h-8"
+                          onClick={() => {
+                            const textarea =
+                              document.getElementById("gtm-strategy");
+                            if (textarea) {
+                              const start = textarea.selectionStart;
+                              const end = textarea.selectionEnd;
+                              const value = field.value;
+                              const newValue =
+                                value.substring(0, start) +
+                                "\n    " +
+                                value.substring(start);
+                              field.onChange(newValue);
+                            }
+                          }}
+                        >
+                          Indent
+                        </Button>
+                      </div>
+                      <Textarea
+                        id="gtm-strategy"
+                        placeholder="Describe the approach taken to launch, promote, and drive adoption, including campaign strategy, key messaging, and channel selection."
+                        className="min-h-[100px] border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                        {...field}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormDescription>
+                    Describe the approach taken to launch, promote, and drive
+                    adoption
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
 
           <div className="space-y-4">
@@ -384,7 +845,10 @@ const ProjectForm = ({
                         <ImageGallery
                           bucket="portfolio-projects"
                           path=""
-                          onSelect={handleMainImageSelect}
+                          onSelect={(url) => {
+                            handleMainImageSelect(url);
+                            setShowGallery(false);
+                          }}
                         />
                       </DialogContent>
                     </Dialog>
@@ -410,7 +874,10 @@ const ProjectForm = ({
                       <ImageGallery
                         bucket="portfolio-projects"
                         path=""
-                        onSelect={handleMainImageSelect}
+                        onSelect={(url) => {
+                          handleMainImageSelect(url);
+                          setShowGallery(false);
+                        }}
                       />
                     </DialogContent>
                   </Dialog>
@@ -464,8 +931,29 @@ const ProjectForm = ({
                     <ImageGallery
                       bucket="portfolio-projects"
                       path=""
-                      onSelect={handleAdditionalImageSelect}
+                      onSelect={(url) => {
+                        handleAdditionalImageSelect(url);
+                        // Don't close dialog to allow multiple selections
+                      }}
                     />
+                    <div className="flex justify-end mt-4">
+                      <Button
+                        onClick={() => {
+                          const dialog =
+                            document.querySelector('[role="dialog"]');
+                          if (dialog) {
+                            const closeButton = dialog.querySelector(
+                              'button[aria-label="Close"]',
+                            );
+                            if (closeButton) {
+                              (closeButton as HTMLButtonElement).click();
+                            }
+                          }
+                        }}
+                      >
+                        Done
+                      </Button>
+                    </div>
                   </DialogContent>
                 </Dialog>
               </div>

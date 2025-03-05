@@ -120,7 +120,7 @@ const HeroSection = ({
             <Button
               size="lg"
               variant="outline"
-              className="border-primary bg-white/90 text-primary hover:bg-white hover:text-primary-foreground"
+              className="border-primary bg-white/90 text-primary hover:bg-white hover:text-primary dark:bg-gray-800/90 dark:text-white dark:hover:bg-gray-800 dark:border-white"
               onClick={() => {
                 const portfolioSection = document.getElementById("portfolio");
                 if (portfolioSection) {

@@ -296,7 +296,10 @@ const SettingsForm = () => {
                           <ImageGallery
                             bucket="portfolio-profile"
                             path=""
-                            onSelect={handleHeroImageSelect}
+                            onSelect={(url) => {
+                              handleHeroImageSelect(url);
+                              setShowImageGallery(false);
+                            }}
                           />
                         </DialogContent>
                       </Dialog>
@@ -324,7 +327,10 @@ const SettingsForm = () => {
                         <ImageGallery
                           bucket="portfolio-profile"
                           path=""
-                          onSelect={handleHeroImageSelect}
+                          onSelect={(url) => {
+                            handleHeroImageSelect(url);
+                            setShowImageGallery(false);
+                          }}
                         />
                       </DialogContent>
                     </Dialog>

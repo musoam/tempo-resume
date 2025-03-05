@@ -23,6 +23,11 @@ const ProjectCard = ({
   demoUrl = "#",
   onViewDetails = () => {},
 }: ProjectCardProps) => {
+  // Function to handle click on the card
+  const handleCardClick = () => {
+    onViewDetails(id);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -31,7 +36,10 @@ const ProjectCard = ({
       whileHover={{ y: -5 }}
       className="h-full"
     >
-      <Card className="overflow-hidden h-full flex flex-col bg-white dark:bg-gray-800 border-0 shadow-md">
+      <Card
+        className="overflow-hidden h-full flex flex-col bg-white dark:bg-gray-800 border-0 shadow-md cursor-pointer"
+        onClick={handleCardClick}
+      >
         <div className="relative overflow-hidden aspect-video">
           <img
             src={imageUrl}
@@ -43,7 +51,10 @@ const ProjectCard = ({
               <Button
                 size="sm"
                 variant="secondary"
-                onClick={() => onViewDetails(id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onViewDetails(id);
+                }}
                 className="gap-1"
               >
                 <Eye size={16} />
@@ -54,7 +65,10 @@ const ProjectCard = ({
                   size="sm"
                   variant="outline"
                   className="bg-white text-black hover:bg-gray-100 gap-1"
-                  onClick={() => window.open(demoUrl, "_blank")}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    window.open(demoUrl, "_blank");
+                  }}
                 >
                   <ExternalLink size={16} />
                   Demo

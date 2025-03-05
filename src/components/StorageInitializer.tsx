@@ -21,11 +21,19 @@ const StorageInitializer = ({
     setErrorMessage(null);
 
     try {
-      // Mock initialization instead of using Supabase
-      console.log("Mock initializing storage and tables");
+      // Import the createStorageBuckets function
+      const { createStorageBuckets } = await import(
+        "@/lib/create-storage-function"
+      );
 
-      // Simulate a delay to make it feel like something is happening
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Create storage buckets directly
+      const success = await createStorageBuckets();
+
+      if (!success) {
+        throw new Error("Failed to create storage buckets");
+      }
+
+      console.log("Storage buckets initialized successfully");
       setStatus("success");
       onInitialized();
     } catch (error) {
