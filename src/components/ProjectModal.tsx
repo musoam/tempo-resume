@@ -112,7 +112,7 @@ const ProjectModal = ({
           <Tabs defaultValue="overview" className="w-full">
             <TabsList className="mb-4">
               <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="technical">Technical Details</TabsTrigger>
+              <TabsTrigger value="technical">Marketing Tech Stack</TabsTrigger>
               <TabsTrigger value="gallery">Gallery</TabsTrigger>
             </TabsList>
 
@@ -206,7 +206,7 @@ const ProjectModal = ({
 
             <TabsContent value="technical" className="space-y-4">
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Industr</h3>
+                <h3 className="text-lg font-medium">Industry segments</h3>
                 <ul className="list-disc pl-5 space-y-2">
                   {technologies.map((tech, index) => (
                     <li key={index}>{tech.name}</li>

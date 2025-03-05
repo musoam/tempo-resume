@@ -78,7 +78,13 @@ const Navigation = ({
       >
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <a href="#home" className="flex items-center space-x-2">
-            <img src={logo} alt={logoAlt} className="h-10 w-10 rounded-full" />
+            <img
+              src={
+                "https://media.licdn.com/dms/image/v2/D4E03AQHnyyg54uyvuQ/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1714765803000?e=1746662400&v=beta&t=QQ7dKDfQHGVfwREzjWkRTYoFlGeNp9SK9Vvqs8Zwfe4"
+              }
+              alt={logoAlt}
+              className="h-10 w-10 rounded-full"
+            />
             <span className="font-bold text-xl hidden sm:inline-block">
               Portfolio
             </span>

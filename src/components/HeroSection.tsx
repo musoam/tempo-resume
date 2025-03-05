@@ -58,7 +58,6 @@ const HeroSection = ({
         <div className="absolute inset-0 bg-black/50" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
       </div>
-
       {/* Content */}
       <div className="container mx-auto px-4 z-10 text-center">
         <motion.div
@@ -107,7 +106,7 @@ const HeroSection = ({
           >
             <Button
               size="lg"
-              className="bg-primary hover:bg-primary/90 text-white font-medium"
+              className="hover:bg-primary/90 text-white font-medium bg-[white/90] border-[#ffffff] border bg-[white/90] bg-[white/90] bg-[white/90] bg-current bg-[white/90] border-[primary/90] border-[primary/90] border-[primary/90]"
               onClick={() => {
                 const contactSection = document.getElementById("contact");
                 if (contactSection) {
@@ -116,6 +115,14 @@ const HeroSection = ({
               }}
             >
               Get in Touch
+              <Button
+                className={
+                  "inline-flex items-center justify-center whitespace-nowrap text-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 shadow h-10 rounded-md px-8 hover:bg-primary/90 text-white font-medium border-[#ffffff] border bg-[white/90]"
+                }
+                onClick={() => console.log("onClick")}
+              >
+                Get in Touch
+              </Button>
             </Button>
             <Button
               size="lg"
@@ -133,7 +140,6 @@ const HeroSection = ({
           </motion.div>
         </motion.div>
       </div>
-
       {/* Scroll down indicator */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -150,7 +156,6 @@ const HeroSection = ({
           <ArrowDown className="h-6 w-6" />
         </Button>
       </motion.div>
-
       {/* Animated shapes in background (optional) */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <motion.div
