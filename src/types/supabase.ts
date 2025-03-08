@@ -9,6 +9,102 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      contact_submissions: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          message: string
+          name: string
+          status: string
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          message: string
+          name: string
+          status?: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      projects: {
+        Row: {
+          category: string
+          createdAt: string | null
+          demoUrl: string | null
+          description: string
+          displayType: string | null
+          githubUrl: string | null
+          id: string
+          images: Json | null
+          imageUrl: string
+          implementationDetails: string | null
+          projectChallenges: string | null
+          projectRole: string | null
+          slug: string | null
+          tags: string[] | null
+          technicalDetails: string | null
+          technologies: Json | null
+          title: string
+          updatedAt: string | null
+          videoUrl: string | null
+          year: string
+        }
+        Insert: {
+          category: string
+          createdAt?: string | null
+          demoUrl?: string | null
+          description: string
+          displayType?: string | null
+          githubUrl?: string | null
+          id?: string
+          images?: Json | null
+          imageUrl: string
+          implementationDetails?: string | null
+          projectChallenges?: string | null
+          projectRole?: string | null
+          slug?: string | null
+          tags?: string[] | null
+          technicalDetails?: string | null
+          technologies?: Json | null
+          title: string
+          updatedAt?: string | null
+          videoUrl?: string | null
+          year: string
+        }
+        Update: {
+          category?: string
+          createdAt?: string | null
+          demoUrl?: string | null
+          description?: string
+          displayType?: string | null
+          githubUrl?: string | null
+          id?: string
+          images?: Json | null
+          imageUrl?: string
+          implementationDetails?: string | null
+          projectChallenges?: string | null
+          projectRole?: string | null
+          slug?: string | null
+          tags?: string[] | null
+          technicalDetails?: string | null
+          technologies?: Json | null
+          title?: string
+          updatedAt?: string | null
+          videoUrl?: string | null
+          year?: string
+        }
+        Relationships: []
+      }
       Resume: {
         Row: {
           created_at: string
@@ -27,12 +123,84 @@ export type Database = {
         }
         Relationships: []
       }
+      site_settings: {
+        Row: {
+          about: string
+          email: string
+          hero_description: string
+          hero_image_url: string
+          hero_title: string
+          id: string
+          location: string | null
+          owner_name: string
+          phone: string | null
+          social_links: Json | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          about: string
+          email: string
+          hero_description: string
+          hero_image_url: string
+          hero_title: string
+          id?: string
+          location?: string | null
+          owner_name: string
+          phone?: string | null
+          social_links?: Json | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          about?: string
+          email?: string
+          hero_description?: string
+          hero_image_url?: string
+          hero_title?: string
+          id?: string
+          location?: string | null
+          owner_name?: string
+          phone?: string | null
+          social_links?: Json | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      tool_logos: {
+        Row: {
+          category: string
+          created_at: string | null
+          id: string
+          logo_url: string
+          name: string
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          id?: string
+          logo_url: string
+          name: string
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          id?: string
+          logo_url?: string
+          name?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_storage_buckets: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never

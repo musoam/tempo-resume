@@ -2,6 +2,7 @@ import React from "react";
 import Navigation from "./Navigation";
 import HeroSection from "./HeroSection";
 import PortfolioSection from "./PortfolioSection";
+import ToolsSection from "./ToolsSection";
 import ContactSection from "./ContactSection";
 import Footer from "./Footer";
 
@@ -15,6 +16,9 @@ function Home() {
         </section>
         <section id="portfolio">
           <PortfolioSection />
+        </section>
+        <section id="tools">
+          <ToolsSection />
         </section>
         <section id="contact">
           <ContactSection />

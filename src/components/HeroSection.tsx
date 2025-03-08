@@ -98,6 +98,7 @@ const HeroSection = ({
           >
             {settings.description}
           </motion.p>
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -106,7 +107,7 @@ const HeroSection = ({
           >
             <Button
               size="lg"
-              className="hover:bg-primary/90 text-white font-medium bg-[white/90] border-[#ffffff] border bg-[white/90] bg-[white/90] bg-[white/90] bg-current bg-[white/90] border-[primary/90] border-[primary/90] border-[primary/90]"
+              className="font-medium bg-transparent text-white hover:bg-white/10 border border-white shadow-md dark:bg-white dark:text-black dark:hover:bg-white/90 dark:border-primary"
               onClick={() => {
                 const contactSection = document.getElementById("contact");
                 if (contactSection) {
@@ -115,19 +116,11 @@ const HeroSection = ({
               }}
             >
               Get in Touch
-              <Button
-                className={
-                  "inline-flex items-center justify-center whitespace-nowrap text-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 shadow h-10 rounded-md px-8 hover:bg-primary/90 text-white font-medium border-[#ffffff] border bg-[white/90]"
-                }
-                onClick={() => console.log("onClick")}
-              >
-                Get in Touch
-              </Button>
             </Button>
             <Button
               size="lg"
               variant="outline"
-              className="border-primary bg-white/90 text-primary hover:bg-white hover:text-primary dark:bg-gray-800/90 dark:text-white dark:hover:bg-gray-800 dark:border-white"
+              className="font-medium bg-transparent text-white hover:bg-white/10 border border-white shadow-md dark:bg-white dark:text-black dark:hover:bg-white/90 dark:border-primary"
               onClick={() => {
                 const portfolioSection = document.getElementById("portfolio");
                 if (portfolioSection) {

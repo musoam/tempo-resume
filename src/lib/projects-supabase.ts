@@ -95,7 +95,7 @@ export async function createProject(
       color: getColorForTag(tag),
     }));
 
-    // Create a new project with minimal data structure
+    // Create a new project with all fields
     const newProject = {
       title: projectData.title,
       description: projectData.description,
@@ -103,6 +103,18 @@ export async function createProject(
       year: projectData.year,
       category: projectData.category,
       slug,
+      tags,
+      demoUrl: projectData.demoUrl || null,
+      videoUrl: projectData.videoUrl || null,
+      projectRole: projectData.projectRole || null,
+      images,
+      technologies,
+      displayType: projectData.displayType || "popup",
+      technicalDetails: projectData.technicalDetails || null,
+      projectChallenges: projectData.projectChallenges || null,
+      implementationDetails: projectData.implementationDetails || null,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
 
     console.log("Creating new project with data:", JSON.stringify(newProject));
@@ -119,44 +131,11 @@ export async function createProject(
       throw error;
     }
 
-    // Now update with the complex fields
-    if (data && data.id) {
-      const updateData = {
-        tags,
-        demoUrl: projectData.demoUrl || null,
-        videoUrl: projectData.videoUrl || null,
-        projectRole: projectData.projectRole || null,
-        images,
-        technologies,
-        technicalDetails: projectData.technicalDetails || null,
-        projectChallenges: projectData.projectChallenges || null,
-        implementationDetails: projectData.implementationDetails || null,
-      };
-
-      const { data: updatedData, error: updateError } = await supabase
-        .from("projects")
-        .update(updateData)
-        .eq("id", data.id)
-        .select()
-        .single();
-
-      if (updateError) {
-        console.error("Update error:", updateError);
-        // Continue anyway, we at least created the basic project
-      }
-
-      console.log(
-        "Project created and updated successfully:",
-        updatedData || data,
-      );
-      return updatedData || (data as Project);
-    }
-
     console.log("Project created successfully:", data);
     return data as Project;
   } catch (error) {
     console.error("Error in createProject:", error);
-    throw error; // Re-throw to show the actual error message
+    return null; // Return null instead of re-throwing to prevent unhandled errors
   }
 }
 
@@ -171,6 +150,8 @@ export async function updateProject(
   projectData: ProjectFormData,
 ): Promise<Project | null> {
   try {
+    console.log(`Starting update for project ${id}`);
+
     // Generate a slug from the title if not provided
     const slug =
       projectData.slug || projectData.title.toLowerCase().replace(/\s+/g, "-");
@@ -195,7 +176,7 @@ export async function updateProject(
       color: getColorForTag(tag),
     }));
 
-    // Create updated project
+    // Create a simple update object with only the fields we want to update
     const updatedProject = {
       title: projectData.title,
       description: projectData.description,
@@ -216,21 +197,27 @@ export async function updateProject(
       updatedAt: new Date().toISOString(),
     };
 
+    console.log("Updating project with data:", JSON.stringify(updatedProject));
+
     // Update in Supabase
     const { data, error } = await supabase
       .from("projects")
       .update(updatedProject)
       .eq("id", id)
-      .select()
-      .single();
+      .select();
 
     if (error) {
       console.error("Update error:", error);
-      throw error;
+      return null;
     }
 
-    console.log("Updated project in Supabase:", data);
-    return data as Project;
+    if (!data || data.length === 0) {
+      console.error("No data returned from update");
+      return null;
+    }
+
+    console.log("Updated project in Supabase:", data[0]);
+    return data[0] as Project;
   } catch (error) {
     console.error("Error in updateProject:", error);
     return null;

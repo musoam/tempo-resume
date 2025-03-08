@@ -119,62 +119,56 @@ const AdminPanel = () => {
                   }
                   onSubmit={async (values) => {
                     try {
-                      // Import the Supabase project functions
-                      const { createProject, updateProject } = await import(
+                      // First make sure the storage buckets exist
+                      const { createStorageBuckets } = await import(
+                        "@/lib/create-storage-function"
+                      );
+                      await createStorageBuckets();
+
+                      // Import the Supabase project functions directly from the file
+                      const projectsSupabase = await import(
                         "@/lib/projects-supabase"
                       );
 
                       if (selectedProject) {
                         // Update existing project
-                        const updated = await updateProject(
+                        console.log(
+                          "Updating project with ID:",
+                          selectedProject.id,
+                        );
+                        console.log("Update values:", JSON.stringify(values));
+
+                        const updated = await projectsSupabase.updateProject(
                           selectedProject.id,
                           values,
                         );
+
                         if (updated) {
+                          console.log("Update successful:", updated);
                           alert("Project updated successfully!");
                           setIsEditingProject(false);
                           setSelectedProject(null);
                         } else {
-                          throw new Error("Failed to update project");
+                          console.error("Update returned null");
+                          alert("Failed to update project. Please try again.");
                         }
                       } else {
                         // Create new project
                         console.log(
                           "Creating new project with values:",
-                          values,
+                          JSON.stringify(values),
                         );
-                        try {
-                          // First make sure the storage buckets exist
-                          const { createStorageBuckets } = await import(
-                            "@/lib/create-storage-function"
-                          );
-                          const bucketsCreated = await createStorageBuckets();
-                          console.log(
-                            "Storage buckets created:",
-                            bucketsCreated,
-                          );
 
-                          // Then create the project
-                          console.log(
-                            "Creating project with values:",
-                            JSON.stringify(values),
-                          );
-                          const created = await createProject(values);
-                          console.log("Project creation result:", created);
+                        const created =
+                          await projectsSupabase.createProject(values);
 
-                          if (created) {
-                            alert("Project created successfully!");
-                            setIsEditingProject(false);
-                          } else {
-                            throw new Error(
-                              "Failed to create project - null result returned",
-                            );
-                          }
-                        } catch (createError) {
-                          console.error("Error creating project:", createError);
-                          alert(
-                            `Error creating project: ${createError.message || "Unknown error"}`,
-                          );
+                        if (created) {
+                          console.log("Creation successful:", created);
+                          alert("Project created successfully!");
+                          setIsEditingProject(false);
+                        } else {
+                          console.error("Creation returned null");
+                          alert("Failed to create project. Please try again.");
                         }
                       }
                     } catch (error) {

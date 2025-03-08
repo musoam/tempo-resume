@@ -30,7 +30,7 @@ const Navigation = ({
   links = [
     { name: "Home", href: "#home" },
     { name: "Portfolio", href: "#portfolio" },
-    { name: "About", href: "#about" },
+    { name: "Tools & Expertise", href: "#tools" },
     { name: "Contact", href: "#contact" },
   ],
   logo = "https://api.dicebear.com/7.x/avataaars/svg?seed=portfolio",
@@ -85,8 +85,8 @@ const Navigation = ({
               alt={logoAlt}
               className="h-10 w-10 rounded-full"
             />
-            <span className="font-bold text-xl hidden sm:inline-block">
-              Portfolio
+            <span className="font-bold text-xl hidden sm:inline-block text-gray-900 dark:text-white">
+              Muso's Portfolio
             </span>
           </a>
 

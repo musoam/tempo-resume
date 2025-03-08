@@ -44,19 +44,22 @@ const PortfolioSection = ({
   projects: initialProjects,
 }: PortfolioSectionProps) => {
   // Use the MockDataProvider to get projects
-  const [projects, setProjects] = React.useState<Project[]>([]);
+  const { projects } = useMockData();
+  const [localProjects, setLocalProjects] = React.useState<Project[]>([]);
 
   React.useEffect(() => {
     const loadProjects = async () => {
       if (initialProjects) {
-        setProjects(initialProjects);
+        setLocalProjects(initialProjects);
+      } else if (projects && projects.length > 0) {
+        setLocalProjects(projects);
       } else {
         try {
           // Import the getProjects function from Supabase
           const { getProjects } = await import("@/lib/projects-supabase");
           const projectsData = await getProjects();
           if (projectsData) {
-            setProjects(projectsData);
+            setLocalProjects(projectsData);
           }
         } catch (error) {
           console.error("Error loading projects:", error);
@@ -65,14 +68,14 @@ const PortfolioSection = ({
     };
 
     loadProjects();
-  }, [initialProjects]);
+  }, [initialProjects, projects]);
 
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Sort projects by year (newest first)
-  const sortedProjects = [...projects].sort((a, b) => {
+  const sortedProjects = [...localProjects].sort((a, b) => {
     return parseInt(b.year) - parseInt(a.year);
   });
 
@@ -84,7 +87,7 @@ const PortfolioSection = ({
         );
 
   const handleViewDetails = (id: string) => {
-    const project = projects.find((p) => p.id === id);
+    const project = localProjects.find((p) => p.id === id);
     if (project) {
       setSelectedProject(project);
       setIsModalOpen(true);
@@ -111,25 +114,25 @@ const PortfolioSection = ({
           </p>
         </motion.div>
 
-        <Tabs defaultValue={categories[0]} className="mb-12">
+        <Tabs
+          defaultValue="All"
+          className="mb-12"
+          onValueChange={setSelectedCategory}
+        >
           <div className="flex justify-center">
             <TabsList>
               {categories.map((category) => (
-                <TabsTrigger
-                  key={category}
-                  value={category}
-                  onClick={() => setSelectedCategory(category)}
-                >
+                <TabsTrigger key={category} value={category}>
                   {category}
                 </TabsTrigger>
               ))}
             </TabsList>
           </div>
 
-          {categories.map((category) => (
-            <TabsContent key={category} value={category} className="mt-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {filteredProjects.map((project) => (
+          <TabsContent value={selectedCategory} className="mt-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredProjects.length > 0 ? (
+                filteredProjects.map((project) => (
                   <ProjectCard
                     key={project.id}
                     id={project.id}
@@ -140,10 +143,16 @@ const PortfolioSection = ({
                     demoUrl={project.demoUrl}
                     onViewDetails={handleViewDetails}
                   />
-                ))}
-              </div>
-            </TabsContent>
-          ))}
+                ))
+              ) : (
+                <div className="col-span-3 text-center py-12">
+                  <p className="text-gray-500">
+                    No projects found in this category.
+                  </p>
+                </div>
+              )}
+            </div>
+          </TabsContent>
         </Tabs>
 
         <div className="text-center mt-12">

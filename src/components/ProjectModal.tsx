@@ -85,8 +85,8 @@ const ProjectModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="bg-white max-w-4xl w-[90vw] max-h-[90vh] overflow-y-auto p-0">
-        <div className="sticky top-0 z-10 bg-white p-6 pb-2 border-b">
+      <DialogContent className="bg-white dark:bg-gray-900 max-w-4xl w-[90vw] max-h-[90vh] overflow-y-auto p-0">
+        <div className="sticky top-0 z-10 bg-white dark:bg-gray-900 p-6 pb-2 border-b dark:border-gray-800">
           <div className="flex justify-between items-center">
             <DialogTitle className="text-2xl font-bold">{title}</DialogTitle>
             <Button
@@ -308,7 +308,7 @@ const ProjectModal = ({
           </Tabs>
         </div>
 
-        <DialogFooter className="p-6 pt-2 border-t bg-gray-50">
+        <DialogFooter className="p-6 pt-2 border-t bg-gray-50 dark:bg-gray-800 dark:border-gray-700">
           <div className="flex flex-col sm:flex-row gap-3 w-full">
             {liveUrl && (
               <Button asChild className="flex-1">

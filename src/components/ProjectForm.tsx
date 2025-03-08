@@ -169,7 +169,12 @@ const ProjectForm = ({
       };
 
       console.log("Submitting project data:", projectData);
-      onSubmit(projectData);
+      try {
+        await onSubmit(projectData);
+      } catch (submitError) {
+        console.error("Error in onSubmit:", submitError);
+        alert("Failed to save project. Please try again.");
+      }
     } catch (error) {
       console.error("Error in handleSubmit:", error);
     }
