@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowDown } from "lucide-react";
 import { Button } from "./ui/button";
-import { getSiteSettings } from "@/lib/settings";
-import { useMockData } from "./MockDataProvider";
+import { supabase } from "@/lib/supabase";
 
 interface HeroSectionProps {
   name?: string;
@@ -36,17 +35,33 @@ const HeroSection = ({
       "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=2070",
   });
 
-  // Get the siteSettings directly from the context
-  const { siteSettings } = useMockData();
-
   useEffect(() => {
-    setSettings({
-      name: name || siteSettings.ownerName,
-      title: title || siteSettings.heroTitle,
-      description: description || siteSettings.heroDescription,
-      backgroundImage: backgroundImage || siteSettings.heroImageUrl,
-    });
-  }, [name, title, description, backgroundImage, siteSettings]);
+    // Fetch settings from Supabase
+    const fetchSettings = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("site_settings")
+          .select("*")
+          .limit(1)
+          .single();
+
+        if (error) throw error;
+
+        if (data) {
+          setSettings({
+            name: name || data.owner_name,
+            title: title || data.hero_title,
+            description: description || data.hero_description,
+            backgroundImage: backgroundImage || data.hero_image_url,
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching site settings:", error);
+      }
+    };
+
+    fetchSettings();
+  }, [name, title, description, backgroundImage]);
   return (
     <section className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-gray-900">
       {/* Background with overlay */}

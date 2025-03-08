@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { useMockData } from "./MockDataProvider";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { X, Plus, Image, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
+import { supabase } from "@/lib/supabase";
 
 import {
   Form,
@@ -91,28 +91,36 @@ const SettingsForm = () => {
     },
   });
 
-  // Use the MockDataProvider directly
-  const { siteSettings } = useMockData();
-
   useEffect(() => {
-    const loadSettings = () => {
+    const loadSettings = async () => {
       setLoading(true);
       try {
-        // Set form values from the context
-        form.reset({
-          title: siteSettings.title,
-          ownerName: siteSettings.ownerName,
-          email: siteSettings.email,
-          phone: siteSettings.phone || "",
-          location: siteSettings.location || "",
-          about: siteSettings.about,
-          heroTitle: siteSettings.heroTitle,
-          heroDescription: siteSettings.heroDescription,
-        });
+        // Fetch settings from Supabase
+        const { data, error } = await supabase
+          .from("site_settings")
+          .select("*")
+          .limit(1)
+          .single();
 
-        // Set other state
-        setHeroImage(siteSettings.heroImageUrl);
-        setSocialLinks(siteSettings.socialLinks);
+        if (error) throw error;
+
+        if (data) {
+          // Set form values from Supabase data
+          form.reset({
+            title: data.title,
+            ownerName: data.owner_name,
+            email: data.email,
+            phone: data.phone || "",
+            location: data.location || "",
+            about: data.about,
+            heroTitle: data.hero_title,
+            heroDescription: data.hero_description,
+          });
+
+          // Set other state
+          setHeroImage(data.hero_image_url);
+          setSocialLinks(data.social_links || []);
+        }
       } catch (err) {
         console.error("Error loading settings:", err);
         setError("Failed to load settings. Using default values.");
@@ -122,7 +130,7 @@ const SettingsForm = () => {
     };
 
     loadSettings();
-  }, [form, siteSettings]);
+  }, [form]);
 
   const handleHeroImageSelect = (url: string) => {
     setHeroImage(url);
@@ -154,9 +162,6 @@ const SettingsForm = () => {
     setSocialLinks(newLinks);
   };
 
-  // Get the updateSiteSettings function directly from the context
-  const { updateSiteSettings } = useMockData();
-
   const onSubmit = async (values: SettingsFormValues) => {
     if (!heroImage) {
       setError("Please select a hero image");
@@ -167,19 +172,49 @@ const SettingsForm = () => {
     setError(null);
 
     try {
-      console.log("Submitting settings form with values:", values);
-      console.log("Hero image:", heroImage);
-      console.log("Social links:", socialLinks);
-
-      const updatedSettings: SiteSettings = {
-        ...values,
-        heroImageUrl: heroImage,
-        socialLinks: socialLinks,
+      // Format settings for Supabase
+      const formattedSettings = {
+        title: values.title,
+        owner_name: values.ownerName,
+        email: values.email,
+        phone: values.phone || null,
+        location: values.location || null,
+        about: values.about,
+        hero_title: values.heroTitle,
+        hero_description: values.heroDescription,
+        hero_image_url: heroImage,
+        social_links: socialLinks,
+        updated_at: new Date().toISOString(),
       };
 
-      console.log("Calling updateSiteSettings with:", updatedSettings);
-      const result = await updateSiteSettings(updatedSettings);
-      console.log("Result from updateSiteSettings:", result);
+      // Check if settings already exist
+      const { data: existingSettings } = await supabase
+        .from("site_settings")
+        .select("id")
+        .limit(1);
+
+      let result;
+
+      if (existingSettings && existingSettings.length > 0) {
+        // Update existing settings
+        const { data, error } = await supabase
+          .from("site_settings")
+          .update(formattedSettings)
+          .eq("id", existingSettings[0].id)
+          .select();
+
+        if (error) throw error;
+        result = data;
+      } else {
+        // Insert new settings
+        const { data, error } = await supabase
+          .from("site_settings")
+          .insert([formattedSettings])
+          .select();
+
+        if (error) throw error;
+        result = data;
+      }
 
       if (!result) {
         throw new Error("Failed to save settings");

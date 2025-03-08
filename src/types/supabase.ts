@@ -47,16 +47,14 @@ export type Database = {
           id: string
           images: Json | null
           imageUrl: string
-          implementationDetails: string | null
-          projectChallenges: string | null
-          projectRole: string | null
+          implementationdetails: string | null
+          projectchallenges: string | null
           slug: string | null
           tags: string[] | null
-          technicalDetails: string | null
+          technicaldetails: string | null
           technologies: Json | null
           title: string
           updatedAt: string | null
-          videoUrl: string | null
           year: string
         }
         Insert: {
@@ -69,16 +67,14 @@ export type Database = {
           id?: string
           images?: Json | null
           imageUrl: string
-          implementationDetails?: string | null
-          projectChallenges?: string | null
-          projectRole?: string | null
+          implementationdetails?: string | null
+          projectchallenges?: string | null
           slug?: string | null
           tags?: string[] | null
-          technicalDetails?: string | null
+          technicaldetails?: string | null
           technologies?: Json | null
           title: string
           updatedAt?: string | null
-          videoUrl?: string | null
           year: string
         }
         Update: {
@@ -91,35 +87,15 @@ export type Database = {
           id?: string
           images?: Json | null
           imageUrl?: string
-          implementationDetails?: string | null
-          projectChallenges?: string | null
-          projectRole?: string | null
+          implementationdetails?: string | null
+          projectchallenges?: string | null
           slug?: string | null
           tags?: string[] | null
-          technicalDetails?: string | null
+          technicaldetails?: string | null
           technologies?: Json | null
           title?: string
           updatedAt?: string | null
-          videoUrl?: string | null
           year?: string
-        }
-        Relationships: []
-      }
-      Resume: {
-        Row: {
-          created_at: string
-          data: string | null
-          id: number
-        }
-        Insert: {
-          created_at?: string
-          data?: string | null
-          id?: number
-        }
-        Update: {
-          created_at?: string
-          data?: string | null
-          id?: number
         }
         Relationships: []
       }
@@ -165,30 +141,6 @@ export type Database = {
           social_links?: Json | null
           title?: string
           updated_at?: string | null
-        }
-        Relationships: []
-      }
-      tool_logos: {
-        Row: {
-          category: string
-          created_at: string | null
-          id: string
-          logo_url: string
-          name: string
-        }
-        Insert: {
-          category: string
-          created_at?: string | null
-          id?: string
-          logo_url: string
-          name: string
-        }
-        Update: {
-          category?: string
-          created_at?: string | null
-          id?: string
-          logo_url?: string
-          name?: string
         }
         Relationships: []
       }

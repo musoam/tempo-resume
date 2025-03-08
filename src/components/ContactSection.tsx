@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useMockData } from "./MockDataProvider";
 import { motion } from "framer-motion";
 import { Mail, MapPin, Phone } from "lucide-react";
 import ContactForm from "./ContactForm";
 import SocialLinks from "./SocialLinks";
 import { Separator } from "./ui/separator";
-import { getSiteSettings } from "@/lib/settings";
+import { supabase } from "@/lib/supabase";
 
 interface ContactInfo {
   icon: React.ReactNode;
@@ -53,41 +52,55 @@ const ContactSection = ({
 }: ContactSectionProps) => {
   const [contactInfo, setContactInfo] = useState(initialContactInfo);
 
-  // Get the useMockData hook
-
-  // Get the siteSettings directly from the context
-  const { siteSettings } = useMockData();
-
   useEffect(() => {
-    // Update contact info with settings data
-    const updatedContactInfo = [
-      {
-        icon: <Mail className="h-6 w-6" />,
-        title: "Email",
-        details: siteSettings.email,
-        link: `mailto:${siteSettings.email}`,
-      },
-    ];
+    // Fetch settings from Supabase
+    const fetchSettings = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("site_settings")
+          .select("email, phone, location")
+          .limit(1)
+          .single();
 
-    if (siteSettings.phone) {
-      updatedContactInfo.push({
-        icon: <Phone className="h-6 w-6" />,
-        title: "Phone",
-        details: siteSettings.phone,
-        link: `tel:${siteSettings.phone.replace(/[^0-9+]/g, "")}`,
-      });
-    }
+        if (error) throw error;
 
-    if (siteSettings.location) {
-      updatedContactInfo.push({
-        icon: <MapPin className="h-6 w-6" />,
-        title: "Location",
-        details: siteSettings.location,
-      });
-    }
+        if (data) {
+          // Update contact info with settings data
+          const updatedContactInfo = [
+            {
+              icon: <Mail className="h-6 w-6" />,
+              title: "Email",
+              details: data.email,
+              link: `mailto:${data.email}`,
+            },
+          ];
 
-    setContactInfo(updatedContactInfo);
-  }, [siteSettings]);
+          if (data.phone) {
+            updatedContactInfo.push({
+              icon: <Phone className="h-6 w-6" />,
+              title: "Phone",
+              details: data.phone,
+              link: `tel:${data.phone.replace(/[^0-9+]/g, "")}`,
+            });
+          }
+
+          if (data.location) {
+            updatedContactInfo.push({
+              icon: <MapPin className="h-6 w-6" />,
+              title: "Location",
+              details: data.location,
+            });
+          }
+
+          setContactInfo(updatedContactInfo);
+        }
+      } catch (error) {
+        console.error("Error fetching contact info:", error);
+      }
+    };
+
+    fetchSettings();
+  }, []);
   return (
     <section className={`py-20 px-4 bg-gray-50 dark:bg-gray-900 ${className}`}>
       <div className="container mx-auto max-w-6xl">
@@ -153,7 +166,7 @@ const ContactSection = ({
             <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md">
               <div className="aspect-video w-full rounded-lg overflow-hidden">
                 <iframe
-                  src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyBgEMcP8mSrlPeI8jMLVh9PU7RBrQZVJ6I&q=${encodeURIComponent(siteSettings.location || "San Francisco, CA")}`}
+                  src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyBgEMcP8mSrlPeI8jMLVh9PU7RBrQZVJ6I&q=${encodeURIComponent(contactInfo[2]?.details || "San Francisco, CA")}`}
                   className="w-full h-full border-0"
                   allowFullScreen
                   loading="lazy"

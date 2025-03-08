@@ -263,11 +263,7 @@ const ToolsSection = ({
 
           <TabsContent value={selectedCategory} className="mt-8">
             <div className="relative">
-              {isLoading && totalImages > 0 && (
-                <div className="absolute inset-0 z-10 flex justify-center items-center bg-background/80">
-                  <LoaderOne />
-                </div>
-              )}
+              {/* Loading animation removed */}
               <InfiniteSlider
                 duration={30}
                 durationOnHover={60}

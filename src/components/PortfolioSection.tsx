@@ -5,7 +5,7 @@ import { Button } from "./ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import ProjectCard from "./ProjectCard";
 import ProjectModal from "./ProjectModal";
-import { useMockData } from "./MockDataProvider";
+import { supabase } from "@/lib/supabase";
 
 interface Project {
   id: string;
@@ -43,23 +43,47 @@ const PortfolioSection = ({
   ],
   projects: initialProjects,
 }: PortfolioSectionProps) => {
-  // Use the MockDataProvider to get projects
-  const { projects } = useMockData();
   const [localProjects, setLocalProjects] = React.useState<Project[]>([]);
 
   React.useEffect(() => {
     const loadProjects = async () => {
       if (initialProjects) {
         setLocalProjects(initialProjects);
-      } else if (projects && projects.length > 0) {
-        setLocalProjects(projects);
       } else {
         try {
-          // Import the getProjects function from Supabase
-          const { getProjects } = await import("@/lib/projects-supabase");
-          const projectsData = await getProjects();
-          if (projectsData) {
-            setLocalProjects(projectsData);
+          // Fetch projects directly from Supabase
+          const { data, error } = await supabase
+            .from("projects")
+            .select("*")
+            .order("year", { ascending: false });
+
+          if (error) throw error;
+
+          if (data) {
+            // Transform data to match the Project type
+            const formattedProjects = data.map((project) => ({
+              id: project.id,
+              title: project.title,
+              description: project.description,
+              imageUrl: project.imageUrl,
+              tags: project.tags || [],
+              demoUrl: project.demoUrl,
+              videoUrl: project.videoUrl,
+              projectRole: project.projectRole,
+              year: project.year,
+              category: project.category,
+              images: project.images || [],
+              technologies: project.technologies || [],
+              displayType: project.displayType || "popup",
+              slug: project.slug,
+              technicalDetails: project.technicalDetails,
+              projectChallenges: project.projectChallenges,
+              implementationDetails: project.implementationDetails,
+              createdAt: project.createdAt,
+              updatedAt: project.updatedAt,
+            }));
+
+            setLocalProjects(formattedProjects);
           }
         } catch (error) {
           console.error("Error loading projects:", error);
@@ -68,7 +92,7 @@ const PortfolioSection = ({
     };
 
     loadProjects();
-  }, [initialProjects, projects]);
+  }, [initialProjects]);
 
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);

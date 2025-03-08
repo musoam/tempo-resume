@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useMockData } from "./MockDataProvider";
 import {
   Github,
   Twitter,
@@ -17,7 +16,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
-import { getSiteSettings } from "@/lib/settings";
+import { supabase } from "@/lib/supabase";
 
 interface SocialLink {
   name: string;
@@ -79,22 +78,34 @@ const SocialLinks = ({
 }: SocialLinksProps) => {
   const [links, setLinks] = useState(initialLinks);
 
-  // Get the useMockData hook
-
-  // Get the siteSettings directly from the context
-  const { siteSettings } = useMockData();
-
   useEffect(() => {
-    if (siteSettings.socialLinks && siteSettings.socialLinks.length > 0) {
-      const formattedLinks = siteSettings.socialLinks.map((link) => ({
-        name: link.name,
-        icon: getIconByName(link.icon),
-        url: link.url,
-      }));
+    // Fetch social links from Supabase
+    const fetchSocialLinks = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("site_settings")
+          .select("social_links")
+          .limit(1)
+          .single();
 
-      setLinks(formattedLinks);
-    }
-  }, [siteSettings]);
+        if (error) throw error;
+
+        if (data && data.social_links && data.social_links.length > 0) {
+          const formattedLinks = data.social_links.map((link) => ({
+            name: link.name,
+            icon: getIconByName(link.icon),
+            url: link.url,
+          }));
+
+          setLinks(formattedLinks);
+        }
+      } catch (error) {
+        console.error("Error fetching social links:", error);
+      }
+    };
+
+    fetchSocialLinks();
+  }, []);
   return (
     <div
       className={`flex items-center justify-center space-x-4 bg-background p-4 ${className}`}

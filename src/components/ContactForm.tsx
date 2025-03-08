@@ -1,9 +1,9 @@
 import React from "react";
-import { useMockData } from "./MockDataProvider";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { motion } from "framer-motion";
+import { supabase } from "@/lib/supabase";
 
 import {
   Form,
@@ -46,10 +46,29 @@ const ContactForm = ({ onSubmit, className = "" }: ContactFormProps = {}) => {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [isSubmitted, setIsSubmitted] = React.useState(false);
 
-  // Get the useMockData hook
+  // Function to add contact submission to Supabase
+  const addContactSubmission = async (formData) => {
+    try {
+      const { data, error } = await supabase
+        .from("contact_submissions")
+        .insert([
+          {
+            name: formData.name,
+            email: formData.email,
+            message: formData.message,
+            status: "new",
+            created_at: new Date().toISOString(),
+          },
+        ])
+        .select();
 
-  // Get the addContactSubmission function directly from the context
-  const { addContactSubmission } = useMockData();
+      if (error) throw error;
+      return data[0];
+    } catch (error) {
+      console.error("Error submitting contact form:", error);
+      return null;
+    }
+  };
 
   const handleSubmit = async (values: FormValues) => {
     setIsSubmitting(true);

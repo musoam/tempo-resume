@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useMockData } from "./MockDataProvider";
 import { ArrowUp, Github, Twitter, Linkedin } from "lucide-react";
 import { Button } from "./ui/button";
+import { supabase } from "@/lib/supabase";
 
 interface FooterProps {
   copyrightText?: string;
@@ -54,27 +54,43 @@ const Footer = ({
   const [copyrightText, setCopyrightText] = useState(initialCopyrightText);
   const [socialLinksState, setSocialLinksState] = useState(initialSocialLinks);
 
-  // Get the siteSettings directly from the context
-  const { siteSettings } = useMockData();
-
   useEffect(() => {
-    // Update copyright text
-    const currentYear = new Date().getFullYear();
-    setCopyrightText(
-      `© ${currentYear} ${siteSettings.title}. All rights reserved.`,
-    );
+    // Fetch settings from Supabase
+    const fetchSettings = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("site_settings")
+          .select("title, social_links")
+          .limit(1)
+          .single();
 
-    // Update social links
-    if (siteSettings.socialLinks && siteSettings.socialLinks.length > 0) {
-      const formattedLinks = siteSettings.socialLinks.map((link) => ({
-        icon: getIconByName(link.icon),
-        url: link.url,
-        label: link.name,
-      }));
+        if (error) throw error;
 
-      setSocialLinksState(formattedLinks);
-    }
-  }, [siteSettings]);
+        if (data) {
+          // Update copyright text
+          const currentYear = new Date().getFullYear();
+          setCopyrightText(
+            `© ${currentYear} ${data.title}. All rights reserved.`,
+          );
+
+          // Update social links
+          if (data.social_links && data.social_links.length > 0) {
+            const formattedLinks = data.social_links.map((link) => ({
+              icon: getIconByName(link.icon),
+              url: link.url,
+              label: link.name,
+            }));
+
+            setSocialLinksState(formattedLinks);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching site settings:", error);
+      }
+    };
+
+    fetchSettings();
+  }, []);
 
   return (
     <footer className="w-full bg-gray-900 text-white py-8 px-4 md:px-8 lg:px-16">

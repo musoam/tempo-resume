@@ -6,13 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Separator } from "./ui/separator";
-import {
-  ContactFormData,
-  getContactSubmissions,
-  updateContactStatus,
-  deleteContactSubmission,
-} from "@/lib/contact";
-import { useMockData } from "./MockDataProvider";
+import { ContactFormData } from "@/lib/contact";
+import { supabase } from "@/lib/supabase";
 
 const ContactSubmissions = () => {
   const [submissions, setSubmissions] = useState<ContactFormData[]>([]);
@@ -22,22 +17,37 @@ const ContactSubmissions = () => {
   const [selectedSubmission, setSelectedSubmission] =
     useState<ContactFormData | null>(null);
 
-  // Get the contactSubmissions directly from the context
-  const { contactSubmissions: mockSubmissions } = useMockData();
-
-  const fetchSubmissions = (status?: string) => {
+  const fetchSubmissions = async (status?: string) => {
     setLoading(true);
     setError(null);
 
     try {
-      // Filter submissions based on status
-      const filteredSubmissions =
-        status !== "all" && status
-          ? mockSubmissions.filter((sub) => sub.status === status)
-          : mockSubmissions;
+      let query = supabase
+        .from("contact_submissions")
+        .select("*")
+        .order("created_at", { ascending: false });
 
-      if (filteredSubmissions) {
-        setSubmissions(filteredSubmissions);
+      // Filter by status if provided and not 'all'
+      if (status && status !== "all") {
+        query = query.eq("status", status);
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+
+      if (data) {
+        // Transform data to match the expected format
+        const formattedSubmissions = data.map((sub) => ({
+          id: sub.id,
+          name: sub.name,
+          email: sub.email,
+          message: sub.message,
+          status: sub.status,
+          createdAt: sub.created_at,
+        }));
+
+        setSubmissions(formattedSubmissions);
       } else {
         throw new Error("Failed to fetch contact submissions");
       }
@@ -51,45 +61,42 @@ const ContactSubmissions = () => {
 
   useEffect(() => {
     fetchSubmissions(activeTab);
-  }, [activeTab, mockSubmissions]);
-
-  // Get the updateContactStatus function directly from the context
-  const { updateContactStatus } = useMockData();
+  }, [activeTab]);
 
   const handleStatusChange = async (id: string, newStatus: string) => {
     try {
-      const success = await updateContactStatus(id, newStatus);
-      if (success) {
-        // Update the local state
-        setSubmissions(
-          submissions.map((sub) =>
-            sub.id === id
-              ? {
-                  ...sub,
-                  status: newStatus as "new" | "read" | "replied" | "archived",
-                }
-              : sub,
-          ),
-        );
+      // Update status in Supabase
+      const { error } = await supabase
+        .from("contact_submissions")
+        .update({ status: newStatus })
+        .eq("id", id);
 
-        // If the selected submission was updated, update it too
-        if (selectedSubmission?.id === id) {
-          setSelectedSubmission({
-            ...selectedSubmission,
-            status: newStatus as "new" | "read" | "replied" | "archived",
-          });
-        }
-      } else {
-        throw new Error("Failed to update status");
+      if (error) throw error;
+
+      // Update the local state
+      setSubmissions(
+        submissions.map((sub) =>
+          sub.id === id
+            ? {
+                ...sub,
+                status: newStatus as "new" | "read" | "replied" | "archived",
+              }
+            : sub,
+        ),
+      );
+
+      // If the selected submission was updated, update it too
+      if (selectedSubmission?.id === id) {
+        setSelectedSubmission({
+          ...selectedSubmission,
+          status: newStatus as "new" | "read" | "replied" | "archived",
+        });
       }
     } catch (err) {
       console.error("Error updating status:", err);
       setError("Failed to update status. Please try again.");
     }
   };
-
-  // Get the deleteContactSubmission function directly from the context
-  const { deleteContactSubmission } = useMockData();
 
   const handleDelete = async (id: string) => {
     if (
@@ -101,17 +108,20 @@ const ContactSubmissions = () => {
     }
 
     try {
-      const success = await deleteContactSubmission(id);
-      if (success) {
-        // Remove from local state
-        setSubmissions(submissions.filter((sub) => sub.id !== id));
+      // Delete from Supabase
+      const { error } = await supabase
+        .from("contact_submissions")
+        .delete()
+        .eq("id", id);
 
-        // If the selected submission was deleted, clear it
-        if (selectedSubmission?.id === id) {
-          setSelectedSubmission(null);
-        }
-      } else {
-        throw new Error("Failed to delete submission");
+      if (error) throw error;
+
+      // Remove from local state
+      setSubmissions(submissions.filter((sub) => sub.id !== id));
+
+      // If the selected submission was deleted, clear it
+      if (selectedSubmission?.id === id) {
+        setSelectedSubmission(null);
       }
     } catch (err) {
       console.error("Error deleting submission:", err);

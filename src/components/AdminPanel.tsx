@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from "./ui/card";
 import StorageInitializer from "./StorageInitializer";
+import DataMigrationButton from "./DataMigrationButton";
 import ImageGallery from "./ImageGallery";
 import ProjectForm from "./ProjectForm";
 import ProjectList from "./ProjectList";
@@ -39,6 +40,10 @@ const AdminPanel = () => {
             />
           </div>
         )}
+
+        <div className="mb-6">
+          <DataMigrationButton />
+        </div>
 
         <Tabs defaultValue="media" className="w-full">
           <TabsList className="mb-6">
