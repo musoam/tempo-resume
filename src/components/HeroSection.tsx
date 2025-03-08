@@ -32,7 +32,7 @@ const HeroSection = ({
       "Marketing expert experienced in creating and optimizing digital products and campaigns within integrated teams.",
     backgroundImage:
       backgroundImage ||
-      "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=2070",
+      "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=1200&q=80",
   });
 
   useEffect(() => {
