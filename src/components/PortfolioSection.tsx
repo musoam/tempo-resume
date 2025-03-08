@@ -144,7 +144,7 @@ const PortfolioSection = ({
           onValueChange={setSelectedCategory}
         >
           <div className="flex justify-center">
-            <TabsList>
+            <TabsList className="flex-wrap h-auto">
               {categories.map((category) => (
                 <TabsTrigger key={category} value={category}>
                   {category}

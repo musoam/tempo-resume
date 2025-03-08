@@ -252,7 +252,7 @@ const ToolsSection = ({
           onValueChange={setSelectedCategory}
         >
           <div className="flex justify-center">
-            <TabsList>
+            <TabsList className="flex-wrap h-auto">
               <TabsTrigger value="analytics">Analytics</TabsTrigger>
               <TabsTrigger value="design">Design</TabsTrigger>
               <TabsTrigger value="email">Email</TabsTrigger>
@@ -267,7 +267,7 @@ const ToolsSection = ({
               <InfiniteSlider
                 duration={30}
                 durationOnHover={60}
-                className="py-6"
+                className="py-6 max-w-full overflow-hidden"
                 key={selectedCategory}
               >
                 {filteredTools.map((tool, index) => (

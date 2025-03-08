@@ -166,7 +166,7 @@ const ContactSection = ({
             <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md">
               <div className="aspect-video w-full rounded-lg overflow-hidden">
                 <iframe
-                  src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyBgEMcP8mSrlPeI8jMLVh9PU7RBrQZVJ6I&q=${encodeURIComponent(contactInfo[2]?.details || "San Francisco, CA")}`}
+                  src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyBgEMcP8mSrlPeI8jMLVh9PU7RBrQZVJ6I&q=${encodeURIComponent(contactInfo.find((info) => info.title === "Location")?.details || "San Francisco, CA")}`}
                   className="w-full h-full border-0"
                   allowFullScreen
                   loading="lazy"

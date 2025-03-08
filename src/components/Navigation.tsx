@@ -149,7 +149,7 @@ const Navigation = ({
             opacity: isOpen ? 1 : 0,
             height: isOpen ? "auto" : 0,
           }}
-          transition={{ duration: 0.3 }}
+          transition={{ duration: 0.2, ease: "easeInOut" }}
           className="md:hidden overflow-hidden bg-white dark:bg-gray-900 shadow-lg"
         >
           <nav className="container mx-auto px-4 py-4 flex flex-col space-y-4">
@@ -174,8 +174,9 @@ const Navigation = ({
                   onClick={(e) => {
                     e.preventDefault();
                     scrollToSection(link.href);
+                    setIsOpen(false);
                   }}
-                  className="text-gray-700 dark:text-gray-200 hover:text-primary transition-colors duration-300 py-2 font-medium border-b border-gray-100 dark:border-gray-800 last:border-0"
+                  className="text-gray-700 dark:text-gray-200 hover:text-primary transition-colors duration-300 py-4 px-2 font-medium border-b border-gray-100 dark:border-gray-800 last:border-0 block w-full text-left"
                 >
                   <div className="flex items-center">
                     {link.icon && <span className="mr-2">{link.icon}</span>}

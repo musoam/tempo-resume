@@ -27,8 +27,11 @@ export function InfiniteSlider({
 
   return (
     <div className={cn("overflow-hidden", className)}>
+      <div className="flex flex-wrap justify-center md:hidden gap-4 py-4">
+        {children}
+      </div>
       <motion.div
-        className="flex w-max"
+        className="hidden md:flex w-max"
         style={{
           gap: `${gap}px`,
           flexDirection: direction === "horizontal" ? "row" : "column",
