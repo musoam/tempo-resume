@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useMockData } from "./MockDataProvider";
-import { motion } from "framer-motion";
 import { ArrowUp, Github, Twitter, Linkedin } from "lucide-react";
 import { Button } from "./ui/button";
-import { getSiteSettings } from "@/lib/settings";
 
 interface FooterProps {
   copyrightText?: string;
@@ -56,8 +54,6 @@ const Footer = ({
   const [copyrightText, setCopyrightText] = useState(initialCopyrightText);
   const [socialLinksState, setSocialLinksState] = useState(initialSocialLinks);
 
-  // Get the useMockData hook
-
   // Get the siteSettings directly from the context
   const { siteSettings } = useMockData();
 
@@ -79,13 +75,9 @@ const Footer = ({
       setSocialLinksState(formattedLinks);
     }
   }, [siteSettings]);
+
   return (
-    <motion.footer
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="w-full bg-gray-900 text-white py-8 px-4 md:px-8 lg:px-16"
-    >
+    <footer className="w-full bg-gray-900 text-white py-8 px-4 md:px-8 lg:px-16">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-center mb-8">
           <div className="mb-6 md:mb-0">
@@ -142,7 +134,7 @@ const Footer = ({
           </Button>
         </div>
       </div>
-    </motion.footer>
+    </footer>
   );
 };
 

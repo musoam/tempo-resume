@@ -10,6 +10,7 @@ import {
 } from "./ui/tooltip";
 import { ThemeToggle } from "./ThemeToggle";
 import { Link } from "react-router-dom";
+import { useUser } from "@clerk/clerk-react";
 
 interface NavLink {
   name: string;
@@ -41,6 +42,7 @@ const Navigation = ({
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const { isSignedIn } = useUser();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -117,7 +119,14 @@ const Navigation = ({
                 </a>
               ),
             )}
-            {showAdmin && <></>}
+            {showAdmin && (
+              <Link
+                to="/admin"
+                className="text-gray-900 dark:text-gray-100 hover:text-primary transition-colors duration-300 font-medium"
+              >
+                {isSignedIn ? "Admin" : "Login"}
+              </Link>
+            )}
             <ThemeToggle />
           </nav>
 
@@ -175,7 +184,7 @@ const Navigation = ({
                 </a>
               ),
             )}
-            {showAdmin && (
+            {showAdmin && isSignedIn && (
               <Link
                 to="/admin"
                 className="text-gray-700 dark:text-gray-200 hover:text-primary transition-colors duration-300 py-2 font-medium border-b border-gray-100 dark:border-gray-800"
@@ -183,6 +192,17 @@ const Navigation = ({
                 <div className="flex items-center">
                   <Settings className="mr-2 h-4 w-4" />
                   Admin
+                </div>
+              </Link>
+            )}
+            {showAdmin && !isSignedIn && (
+              <Link
+                to="/admin"
+                className="text-gray-700 dark:text-gray-200 hover:text-primary transition-colors duration-300 py-2 font-medium border-b border-gray-100 dark:border-gray-800"
+              >
+                <div className="flex items-center">
+                  <Settings className="mr-2 h-4 w-4" />
+                  Login
                 </div>
               </Link>
             )}

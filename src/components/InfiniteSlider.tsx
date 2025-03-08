@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { useState, useRef } from "react";
+import { useState } from "react";
 
 type InfiniteSliderProps = {
   children: React.ReactNode;
@@ -22,13 +22,11 @@ export function InfiniteSlider({
   className,
 }: InfiniteSliderProps) {
   const [hovering, setHovering] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-
   const currentDuration =
     hovering && durationOnHover ? durationOnHover : duration;
 
   return (
-    <div className={cn("overflow-hidden", className)} ref={containerRef}>
+    <div className={cn("overflow-hidden", className)}>
       <motion.div
         className="flex w-max"
         style={{
@@ -39,14 +37,14 @@ export function InfiniteSlider({
           x:
             direction === "horizontal"
               ? reverse
-                ? ["100%", "0%"]
-                : ["0%", "-50%"]
+                ? [0, -1000, 0]
+                : [0, -1000, 0]
               : 0,
           y:
             direction === "vertical"
               ? reverse
-                ? ["100%", "0%"]
-                : ["0%", "-50%"]
+                ? [0, -1000, 0]
+                : [0, -1000, 0]
               : 0,
         }}
         transition={{
